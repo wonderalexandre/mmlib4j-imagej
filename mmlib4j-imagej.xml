@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="Create Runnable Jar for Project mmorph4j-imagej">
+    <!--this file was created by Eclipse Runnable JAR Export Wizard-->
+    <!--ANT 1.7 is required                                        -->
+    <target name="create_run_jar">
+        <jar destfile="builds/MMLib4J_v1.jar" filesetmanifest="mergewithoutmain">
+            <manifest>
+                <attribute name="Class-Path" value="."/>
+            </manifest>
+            <fileset dir="../mmlib4j-imagej/bin"/>
+            <fileset dir="../mmlib4j/bin"/>
+            <zipfileset excludes="META-INF/*.SF" src="../mmlib4j/libs/jung-api-2.0.1.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../mmlib4j/libs/collections-generic-4.01.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../mmlib4j/libs/colt-1.2.0.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../mmlib4j/libs/jung-algorithms-2.0.1.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../mmlib4j/libs/jung-graph-impl-2.0.1.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../mmlib4j/libs/jung-visualization-2.0.1.jar"/>
+        </jar>
+    </target>
+</project>
