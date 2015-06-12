@@ -8,7 +8,6 @@ import ij.plugin.frame.PlugInFrame;
 import ij.process.ByteProcessor;
 
 import java.awt.BasicStroke;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics2D;
@@ -25,9 +24,9 @@ import java.util.HashMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
-import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -37,7 +36,6 @@ import mmlib4j.imagej.utils.ImageJAdapter;
 import mmlib4j.images.ColorImage;
 import mmlib4j.images.GrayScaleImage;
 import mmlib4j.images.impl.ImageFactory;
-import mmlib4j.segmentation.Labeling;
 import mmlib4j.segmentation.RegionalMinimaByIFT;
 import mmlib4j.segmentation.WatershedByIFT;
 import mmlib4j.utils.AdjacencyRelation;
@@ -45,47 +43,35 @@ import mmlib4j.utils.ImageBuilder;
 import mmlib4j.utils.ImageUtils;
 
 public class InterativeWatershedByMarked extends PlugInFrame implements MouseListener, ActionListener, MouseMotionListener, WindowListener, ChangeListener {
-	private final int PEN_OP = 1;
-
-	/* Current mouse coordinates */
+	
 	private int mousex = 0;
 	private int mousey = 0;
-
-	/* Previous mouse coordinates */
 	private int prevx = 0;
 	private int prevy = 0;
 
-	/* Initial state falgs for operation */
 	private boolean initialPen = true;
-	private int flagView = 1;
 	
-	private int udefAlphaValue = 25;
-	
-	/* Primitive status & color variables */
-	private int opStatus = PEN_OP;
-	private Color userDefinedColor = new Color(0, 255, 20);
+	private int alphaValue = 25;
+	private Color labelCombo = new Color(0, 255, 20);
 
-	/* User defined Color variables */
-	private JSlider alphaSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, udefAlphaValue);
-	Border borda = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK,3));
-	
+	private JSlider alphaSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, alphaValue);
+	private JCheckBox viewCheckbox = new JCheckBox("show gradient and marked");
 	private JButton applyButton = new JButton("Apply");
-	private JButton reloadButton = new JButton("Reload");
-	private JButton viewButton = new JButton("View");
-	private JButton labelButton = new JButton("Labeling");
-	private JButton filterMinimaButton = new JButton("Regional minima");
+	private JButton reloadButton = new JButton("Reset");
+	private JButton filterMinimaButton = new JButton("Extraction of marked (minima)");
 	
 	ComboBoxColor comboColor = new ComboBoxColor();
-	/* Sub panels of the main applet */
 	private JPanel controlPanel = new JPanel(new GridLayout(2, 0, 0, 0));
-	private JPanel udefcolPanel = new JPanel(new GridLayout(3, 0, 0, 0));
-	private JPanel buttonPanel;
+	private JPanel udefcolPanel = new JPanel(new GridLayout(2, 0, 0, 0));
+	private JPanel buttonPanel = new JPanel(new GridLayout(4, 0, 0, 0));
 	
 	private GrayScaleImage imgInput;
 	private BufferedImage imgCurrent;
 	private GrayScaleImage imgLabel;
+	private GrayScaleImage imgGrad;
+	
 	int imgMarcador[][];
-	AdjacencyRelation adj = AdjacencyRelation.getCircular(1.5f);
+	AdjacencyRelation adj = AdjacencyRelation.getAdjacency8();
 	
 	private ImagePlus imgPlus;
 	private MouseListener mouseListers[];
@@ -93,42 +79,42 @@ public class InterativeWatershedByMarked extends PlugInFrame implements MouseLis
 	private Cursor hourglassCursor;
 	
 	public InterativeWatershedByMarked(ImagePlus imgPlus) {
-		super("MMorph4J - Watershed");
+		super("MMLib4J - Watershed");
 		this.imgPlus = imgPlus;
 		this.imgInput = ImageJAdapter.toGrayScaleImage( (ByteProcessor) imgPlus.getProcessor());
-		
+		this.imgGrad = MorphologicalOperators.gradient(imgInput, adj);
 		this.imgCurrent = new BufferedImage(imgInput.getWidth(), imgInput.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
 		for(int x=0; x < imgInput.getWidth(); x++)
 			for(int y=0; y < imgInput.getHeight(); y++)
 				imgCurrent.setRGB(x, y, imgInput.getPixel(x, y));
 		
-		buttonPanel = new JPanel(new GridLayout(5, 0, 0, 0));
 		
-		controlPanel.add(udefcolPanel);
-		controlPanel.add(buttonPanel);
+		buttonPanel.add(viewCheckbox);
 		
 		buttonPanel.add(reloadButton);
 		buttonPanel.add(applyButton);
-		buttonPanel.add(viewButton);
-		buttonPanel.add(labelButton);
 		buttonPanel.add(filterMinimaButton);
 		
 		
 		reloadButton.addActionListener(this);
-		viewButton.addActionListener(this);
+		viewCheckbox.addActionListener(this);
 		applyButton.addActionListener(this);
 		filterMinimaButton.addActionListener(this);
-		labelButton.addActionListener(this);
+		
 		
 		alphaSlider.setBorder(BorderFactory.createTitledBorder("Alpha"));
 		alphaSlider.setMajorTickSpacing(25);
 		alphaSlider.setMinorTickSpacing(10);
 		alphaSlider.setPaintTicks(true);
 		alphaSlider.setPaintLabels(true);
-		udefcolPanel.add(alphaSlider, BorderLayout.NORTH);
+		comboColor.addActionListener(this);
+        comboColor.setBorder(BorderFactory.createTitledBorder("Marked label"));
 		
-        udefcolPanel.add(comboColor);
-        comboColor.addActionListener(this);
+		udefcolPanel.add(alphaSlider);
+		udefcolPanel.add(comboColor);
+		
+		controlPanel.add(udefcolPanel);
+		controlPanel.add(buttonPanel);
         controlPanel.setBackground(Color.WHITE);
 		
         imgMarcador = new int[imgInput.getWidth()][imgInput.getHeight()];
@@ -153,7 +139,7 @@ public class InterativeWatershedByMarked extends PlugInFrame implements MouseLis
 		
 		imgPlus.getCanvas().addMouseMotionListener(this);
 		imgPlus.getCanvas().addMouseListener(this);
-		super.setSize(260, 450);
+		super.setSize(260, 350);
 		//super.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			
 		
@@ -165,8 +151,6 @@ public class InterativeWatershedByMarked extends PlugInFrame implements MouseLis
 	}
 	
 	public void windowClosed(WindowEvent e) {
-		imgPlus.setImage( imgCurrent );
-		
 		imgPlus.getCanvas().removeMouseListener(this);
 		imgPlus.getCanvas().removeMouseMotionListener(this);
 		imgPlus.getCanvas().setCursor(hourglassCursor);
@@ -176,13 +160,14 @@ public class InterativeWatershedByMarked extends PlugInFrame implements MouseLis
 		for(MouseMotionListener mml: mouseMotionListers)
 			imgPlus.getCanvas().addMouseMotionListener(mml);
 		
-		this.setVisible(false);	
-		this.setEnabled(false);
+		
+		
+	}
+	public void windowClosing(WindowEvent e) {
+		imgPlus.setProcessor( ImageJAdapter.toByteProcessor(imgInput) );
+		super.close();
 	}
 	public void windowOpened(WindowEvent e) { }
-	public void windowClosing(WindowEvent e) {	
-        super.windowClosing(e);
-	}
 	public void windowIconified(WindowEvent e) { }
 	public void windowDeiconified(WindowEvent e) { }
 	public void windowActivated(WindowEvent e) { }
@@ -190,37 +175,34 @@ public class InterativeWatershedByMarked extends PlugInFrame implements MouseLis
 	
 	
 	
-	
+
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == comboColor){
 			updateRGBValues();
 		}else if(e.getSource() == reloadButton){
-			updateRGBValues();
+			
+			this.imgCurrent = new BufferedImage(imgInput.getWidth(), imgInput.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+			for(int x=0; x < imgInput.getWidth(); x++)
+				for(int y=0; y < imgInput.getHeight(); y++)
+					imgCurrent.setRGB(x, y, imgInput.getPixel(x, y));
+			
 			updateImage();
-		}else if(e.getSource() == viewButton){
-			viewMarcador();
+		}else if(e.getSource() == viewCheckbox){
+			if(viewCheckbox.isSelected())
+				viewMarcador();
+			else
+				apply();
 		}
 		else if(e.getSource() == applyButton){
-			apply();
+			if(viewCheckbox.isSelected())
+				apply();
+			imgPlus.setImage( imgCurrent );
+			super.close();
 		}else if(e.getSource() == filterMinimaButton){
 			filterMinima();
-		}else if(e.getSource() == labelButton){
-			labeling();
 		}
 	}
 	
-	public void labeling(){
-		GrayScaleImage imgLabeling = Labeling.labeling(imgInput, adj);
-		ColorImage imgM = imgLabeling.randomColor();
-		for(int x=0; x < imgInput.getWidth(); x++){
-			for(int y=0; y < imgInput.getHeight(); y++){
-				setSuperPixel(x, y, imgM.getPixel(x, y), 1);
-			
-			}
-		}
-		flagView = 0;
-		viewMarcador();
-	}
 	
 	public void filterMinima(){
 		GrayScaleImage imgM = RegionalMinimaByIFT.extractionOfRegionalMinima(imgInput); 
@@ -231,15 +213,13 @@ public class InterativeWatershedByMarked extends PlugInFrame implements MouseLis
 				}
 			}
 		}
-		flagView = 0;
-		viewMarcador();
+		apply();
 	}
 	
 	public void apply(){
 		GrayScaleImage imgGrad = MorphologicalOperators.gradient(imgInput, adj);
-	
 		HashMap<Integer, Integer> labels = new HashMap<Integer, Integer>();
-		int label = 1;
+		
 		GrayScaleImage imgM = ImageFactory.createGrayScaleImage(32, imgInput.getWidth(), imgInput.getHeight());
 		for(int x=0; x < imgInput.getWidth(); x++){
 			for(int y=0; y < imgInput.getHeight(); y++){
@@ -256,8 +236,7 @@ public class InterativeWatershedByMarked extends PlugInFrame implements MouseLis
 			}
 		}
 		
-		GrayScaleImage imgWS = WatershedByIFT.watershedByMarker(imgGrad, imgM);
-		imgLabel = imgWS;
+		imgLabel = WatershedByIFT.watershedByMarker(imgGrad, imgM);
 		
 		updateWS();
 	}
@@ -290,43 +269,18 @@ public class InterativeWatershedByMarked extends PlugInFrame implements MouseLis
 	}
 	
 	public void viewMarcador(){
-		if(flagView == 1){
-			for(int x=0; x < imgCurrent.getWidth(); x++){
-				for(int y=0; y < imgCurrent.getHeight(); y++){
-					if(imgMarcador[x][y] == -1)
-						imgCurrent.setRGB(x, y, Color.BLACK.getRGB());
-					else
-						imgCurrent.setRGB(x, y, imgMarcador[x][y]);
-				}
-			}
-			
-		}else if(flagView == 0){
-			for(int x=0; x < imgCurrent.getWidth(); x++){
-				for(int y=0; y < imgCurrent.getHeight(); y++){
-					if(imgMarcador[x][y] != -1){
-						imgCurrent.setRGB(x, y, imgMarcador[x][y]);
-					}else{
-						imgCurrent.setRGB(x, y, imgCurrent.getRGB(x, y));
-					}
-				}
-			}
-			
-		}
-		else{
-			GrayScaleImage imgGrad = MorphologicalOperators.gradient(imgInput, adj);
-			for(int x=0; x < imgCurrent.getWidth(); x++){
-				for(int y=0; y < imgCurrent.getHeight(); y++){
+		for(int x=0; x < imgCurrent.getWidth(); x++){
+			for(int y=0; y < imgCurrent.getHeight(); y++){
+				if(imgMarcador[x][y] != -1){
+					imgCurrent.setRGB(x, y, imgMarcador[x][y]);
+				}else{
 					imgCurrent.setRGB(x, y, new Color(imgGrad.getPixel(x, y), imgGrad.getPixel(x, y), imgGrad.getPixel(x, y)).getRGB() );
 				}
 			}
 		}
 		
-		
-		//imgPlus.getCanvas().getGraphics().drawImage(imgCurrent, 0, 0, null);
 		imgPlus.setImage( imgCurrent );
-		flagView += 1;
-		if(flagView > 2)
-			flagView = 0;
+		
 	}
 	
 	public void updateImage(){
@@ -335,17 +289,13 @@ public class InterativeWatershedByMarked extends PlugInFrame implements MouseLis
 			for(int y=0; y < imgInput.getHeight(); y++)
 				imgMarcador[x][y] = -1;
 		
-		//this.imgCurrent = ImageBuilder.convertToImage(imgInput);
-		
-		//imgPlus.setProcessor( ImageJAdapter.toByteProcessor(imgInput) );
-		//imgPlus.getCanvas().getGraphics().drawImage( ImageBuilder.convertToImage(imgInput), 0, 0, null);
-		imgPlus.setImage( ImageBuilder.convertToImage(imgInput) );
+		imgPlus.setProcessor( ImageJAdapter.toByteProcessor(imgInput) );
 	}
 
 
 	public void penOperation(MouseEvent e) {
 		Graphics2D g = (Graphics2D) imgPlus.getCanvas().getGraphics();
-		g.setColor(userDefinedColor);
+		g.setColor(labelCombo);
 		g.setStroke(new BasicStroke(4.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 		
 		
@@ -353,7 +303,7 @@ public class InterativeWatershedByMarked extends PlugInFrame implements MouseLis
 			setGraphicalDefaults(e);
 			initialPen = false;
 			
-			drawLine(prevx, prevy, mousex, mousey, userDefinedColor.getRGB());
+			drawLine(prevx, prevy, mousex, mousey, labelCombo.getRGB());
 			g.drawLine(prevx, prevy, mousex, mousey);
 			
 		}
@@ -362,7 +312,7 @@ public class InterativeWatershedByMarked extends PlugInFrame implements MouseLis
 			mousex = e.getX();
 			mousey = e.getY();
 			
-			drawLine(prevx, prevy, mousex, mousey, userDefinedColor.getRGB());
+			drawLine(prevx, prevy, mousex, mousey, labelCombo.getRGB());
 			g.drawLine(prevx, prevy, mousex, mousey);
 			
 			prevx = mousex;
@@ -378,23 +328,16 @@ public class InterativeWatershedByMarked extends PlugInFrame implements MouseLis
 	}
 
 	public void mouseDragged(MouseEvent e) {
-		switch (opStatus) {
-		case PEN_OP:
-				penOperation(e);
-				break;
-
-		}
+		penOperation(e);
 	}
 	
 	
 
 	public void mouseReleased(MouseEvent e) {
-		switch (opStatus) {
-		case PEN_OP:
-			releasedPen();
-			break;
-
-		}
+		releasedPen();
+		if(!viewCheckbox.isSelected())
+			apply();
+			
 	}
 
 	public void mouseEntered(MouseEvent e) {}
@@ -402,8 +345,6 @@ public class InterativeWatershedByMarked extends PlugInFrame implements MouseLis
 	public void mouseExited(MouseEvent e) {}
 	public void mouseMoved(MouseEvent e) {}
 	public void mousePressed(MouseEvent e) {}
-
-	
 	
 	public void releasedPen() {
 		initialPen = true;
@@ -415,9 +356,9 @@ public class InterativeWatershedByMarked extends PlugInFrame implements MouseLis
 
 
 	public void updateRGBValues() {
-		userDefinedColor = comboColor.getColor();
-		if(udefAlphaValue != alphaSlider.getValue()){
-			udefAlphaValue = alphaSlider.getValue();
+		labelCombo = comboColor.getColor();
+		if(alphaValue != alphaSlider.getValue()){
+			alphaValue = alphaSlider.getValue();
 			if(imgLabel != null)
 				updateWS();
 		}
