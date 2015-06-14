@@ -8,12 +8,12 @@ import java.util.ArrayList;
 import mmlib4j.representation.tree.IMorphologicalTreeFiltering;
 import mmlib4j.representation.tree.InfoPrunedTree;
 import mmlib4j.representation.tree.attribute.Attribute;
+import mmlib4j.representation.tree.attribute.ComputerExtinctionValueComponentTree;
+import mmlib4j.representation.tree.attribute.ComputerExtinctionValueTreeOfShapes;
+import mmlib4j.representation.tree.attribute.ComputerMserComponentTree;
+import mmlib4j.representation.tree.attribute.ComputerMserTreeOfShapes;
 import mmlib4j.representation.tree.componentTree.ComponentTree;
 import mmlib4j.representation.tree.componentTree.NodeCT;
-import mmlib4j.representation.tree.pruningStrategy.ComputerExtinctionValueCT;
-import mmlib4j.representation.tree.pruningStrategy.ComputerExtinctionValueToS;
-import mmlib4j.representation.tree.pruningStrategy.ComputerMserCT;
-import mmlib4j.representation.tree.pruningStrategy.ComputerMserToS;
 import mmlib4j.representation.tree.pruningStrategy.PruningBasedGradualTransition;
 import mmlib4j.representation.tree.tos.NodeToS;
 import mmlib4j.representation.tree.tos.TreeOfShape;
@@ -86,7 +86,7 @@ public class HistogramOfBranch {
 		
 	}
 
-	public void showScoreMser(Double []q) {
+	public void showScoreMser(Attribute []q) {
 
 		 
 		int contStable = 0;
@@ -103,7 +103,7 @@ public class HistogramOfBranch {
 		for (int i = 0; i < q.length; i++) {
 			if(q[i] != null){
 				indiceScore[contScore] = i;
-				score[contScore] = q[i];
+				score[contScore] = q[i].getValue();
 				contScore++;
 			}
 		}
@@ -133,7 +133,7 @@ public class HistogramOfBranch {
 			ComponentTree tree = (ComponentTree) treeIn;
 			
 			if (typePruning == IMorphologicalTreeFiltering.EXTINCTION_VALUE){
-				ComputerExtinctionValueCT ev = new ComputerExtinctionValueCT(tree);
+				ComputerExtinctionValueComponentTree ev = new ComputerExtinctionValueComponentTree(tree);
 				boolean selected[] = ev.getExtinctionValueNodeCT(indexAttr, prunedTree);
 				boolean selected2[] = new boolean[tree.getNumNode()];
 				ArrayList<NodeCT> listEVPath = new ArrayList<NodeCT>();
@@ -164,7 +164,7 @@ public class HistogramOfBranch {
 				}
 				//VisualizationComponentTree.getInstance(prunedTree, selected, selected2).setVisible(true);
 			}else if(typePruning == IMorphologicalTreeFiltering.PRUNING_MSER){
-				ComputerMserCT mser = new ComputerMserCT(tree);
+				ComputerMserComponentTree mser = new ComputerMserComponentTree(tree);
 				boolean selected[] = mser.getMappingNodesByMSER(delta, prunedTree); 
 				boolean selected2[] = new boolean[tree.getNumNode()];
 				ArrayList<NodeCT> listEVPath = new ArrayList<NodeCT>();
@@ -173,7 +173,7 @@ public class HistogramOfBranch {
 				while(prunedTree.wasPruned(node)){
 					node = node.getParent();
 				}
-				showScoreMser(mser.getScore());
+				showScoreMser(mser.getAttributeStability());
 				showScoreMser(node, selected, mser.getScoreOfBranch(node));
 				
 				selected2[node.hashCode()] = true;
@@ -250,7 +250,7 @@ public class HistogramOfBranch {
 			TreeOfShape tree = (TreeOfShape) treeIn;
 			
 			if (typePruning == IMorphologicalTreeFiltering.EXTINCTION_VALUE){
-				ComputerExtinctionValueToS ev = new ComputerExtinctionValueToS(tree);
+				ComputerExtinctionValueTreeOfShapes ev = new ComputerExtinctionValueTreeOfShapes(tree);
 				boolean selected[] = ev.getExtinctionValueNode(indexAttr, prunedTree);
 				boolean selected2[] = new boolean[tree.getNumNode()];
 				ArrayList<NodeToS> listEVPath = new ArrayList<NodeToS>();
@@ -283,7 +283,7 @@ public class HistogramOfBranch {
 				
 			}
 			else if(typePruning == IMorphologicalTreeFiltering.PRUNING_MSER){
-				ComputerMserToS mser = new ComputerMserToS(tree);
+				ComputerMserTreeOfShapes mser = new ComputerMserTreeOfShapes(tree);
 				boolean selected[] = mser.getMappingNodesByMSER(delta, prunedTree); 
 				boolean selected2[] = new boolean[tree.getNumNode()];
 				ArrayList<NodeToS> listEVPath = new ArrayList<NodeToS>();
@@ -380,7 +380,7 @@ public class HistogramOfBranch {
 			ComponentTree tree = (ComponentTree) treeIn;
 			
 			if (typePruning == IMorphologicalTreeFiltering.EXTINCTION_VALUE){
-				ComputerExtinctionValueCT ev = new ComputerExtinctionValueCT(tree);
+				ComputerExtinctionValueComponentTree ev = new ComputerExtinctionValueComponentTree(tree);
 				boolean selected[] = ev.getExtinctionValueNodeCT(indexAttr);
 				boolean selected2[] = new boolean[tree.getNumNode()];
 				ArrayList<NodeCT> listEVPath = new ArrayList<NodeCT>();
@@ -411,7 +411,7 @@ public class HistogramOfBranch {
 				}
 				//VisualizationComponentTree.getInstance(prunedTree, selected, selected2).setVisible(true);
 			}else if(typePruning == IMorphologicalTreeFiltering.PRUNING_MSER){
-				ComputerMserCT mser = new ComputerMserCT(tree);
+				ComputerMserComponentTree mser = new ComputerMserComponentTree(tree);
 				boolean selected[] = mser.getMappingNodesByMSER(delta); 
 				boolean selected2[] = new boolean[tree.getNumNode()];
 				ArrayList<NodeCT> listEVPath = new ArrayList<NodeCT>();
@@ -498,7 +498,7 @@ public class HistogramOfBranch {
 			TreeOfShape tree = (TreeOfShape) treeIn;
 			
 			if (typePruning == IMorphologicalTreeFiltering.EXTINCTION_VALUE){
-				ComputerExtinctionValueToS ev = new ComputerExtinctionValueToS(tree);
+				ComputerExtinctionValueTreeOfShapes ev = new ComputerExtinctionValueTreeOfShapes(tree);
 				boolean selected[] = ev.getExtinctionValueNode(indexAttr, delta);
 				boolean selected2[] = new boolean[tree.getNumNode()];
 				ArrayList<NodeToS> listEVPath = new ArrayList<NodeToS>();
@@ -532,7 +532,7 @@ public class HistogramOfBranch {
 				
 			}
 			else if(typePruning == IMorphologicalTreeFiltering.PRUNING_MSER){
-				ComputerMserToS mser = new ComputerMserToS(tree);
+				ComputerMserTreeOfShapes mser = new ComputerMserTreeOfShapes(tree);
 				boolean selected[] = mser.getMappingNodesByMSER(delta); 
 				boolean selected2[] = new boolean[tree.getNumNode()];
 				ArrayList<NodeToS> listEVPath = new ArrayList<NodeToS>();
@@ -628,7 +628,7 @@ public class HistogramOfBranch {
 			ComponentTree tree = (ComponentTree) treeIn;
 			
 			if (typePruning == IMorphologicalTreeFiltering.EXTINCTION_VALUE){
-				ComputerExtinctionValueCT ev = new ComputerExtinctionValueCT(tree);
+				ComputerExtinctionValueComponentTree ev = new ComputerExtinctionValueComponentTree(tree);
 				boolean selected[] = ev.getExtinctionValueNodeCT(indexAttr);
 				boolean selected2[] = new boolean[tree.getNumNode()];
 				
@@ -664,7 +664,7 @@ public class HistogramOfBranch {
 				}
 				//VisualizationComponentTree.getInstance(prunedTree, selected, selected2).setVisible(true);
 			}else if(typePruning == IMorphologicalTreeFiltering.PRUNING_MSER){
-				ComputerMserCT mser = new ComputerMserCT(tree);
+				ComputerMserComponentTree mser = new ComputerMserComponentTree(tree);
 				boolean selected[] = mser.getMappingNodesByMSER(delta); 
 				boolean selected2[] = new boolean[tree.getNumNode()];
 				ArrayList<NodeCT> listEVPath = new ArrayList<NodeCT>();
@@ -767,7 +767,7 @@ public class HistogramOfBranch {
 			TreeOfShape tree = (TreeOfShape) treeIn;
 			
 			if (typePruning == IMorphologicalTreeFiltering.EXTINCTION_VALUE){
-				ComputerExtinctionValueToS ev = new ComputerExtinctionValueToS(tree);
+				ComputerExtinctionValueTreeOfShapes ev = new ComputerExtinctionValueTreeOfShapes(tree);
 				boolean selected[] = ev.getExtinctionValueNode(indexAttr, delta);
 				boolean selected2[] = new boolean[tree.getNumNode()];
 				ArrayList<NodeToS> listEVPath = new ArrayList<NodeToS>();
@@ -807,7 +807,7 @@ public class HistogramOfBranch {
 				
 			}
 			else if(typePruning == IMorphologicalTreeFiltering.PRUNING_MSER){
-				ComputerMserToS mser = new ComputerMserToS(tree);
+				ComputerMserTreeOfShapes mser = new ComputerMserTreeOfShapes(tree);
 				boolean selected[] = mser.getMappingNodesByMSER(delta); 
 				boolean selected2[] = new boolean[tree.getNumNode()];
 				ArrayList<NodeToS> listEVPath = new ArrayList<NodeToS>();
@@ -913,7 +913,7 @@ public class HistogramOfBranch {
 		if(treeIn instanceof ComponentTree){	
 			ComponentTree tree = (ComponentTree) treeIn;
 			
-			ComputerExtinctionValueCT ev = new ComputerExtinctionValueCT(tree);
+			ComputerExtinctionValueComponentTree ev = new ComputerExtinctionValueComponentTree(tree);
 			boolean selected[] = ev.getExtinctionValueNodeCT(indexAttr);
 			boolean selected2[] = new boolean[tree.getNumNode()];
 			ArrayList<NodeCT> listEVPath = new ArrayList<NodeCT>();

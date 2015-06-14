@@ -32,13 +32,13 @@ import mmlib4j.images.GrayScaleImage;
 import mmlib4j.representation.tree.IMorphologicalTreeFiltering;
 import mmlib4j.representation.tree.InfoPrunedTree;
 import mmlib4j.representation.tree.attribute.Attribute;
+import mmlib4j.representation.tree.attribute.ComputerExtinctionValueComponentTree;
+import mmlib4j.representation.tree.attribute.ComputerExtinctionValueTreeOfShapes;
+import mmlib4j.representation.tree.attribute.ComputerMserTreeOfShapes;
+import mmlib4j.representation.tree.attribute.ComputerTbmrComponentTree;
 import mmlib4j.representation.tree.componentTree.ComponentTree;
 import mmlib4j.representation.tree.componentTree.ConnectedFilteringByComponentTree;
 import mmlib4j.representation.tree.componentTree.VisualizationComponentTree;
-import mmlib4j.representation.tree.pruningStrategy.ComputerExtinctionValueCT;
-import mmlib4j.representation.tree.pruningStrategy.ComputerExtinctionValueToS;
-import mmlib4j.representation.tree.pruningStrategy.ComputerMserToS;
-import mmlib4j.representation.tree.pruningStrategy.ComputerTbmrCT;
 import mmlib4j.representation.tree.pruningStrategy.PruningBasedAttribute;
 import mmlib4j.representation.tree.pruningStrategy.PruningBasedGradualTransition;
 import mmlib4j.representation.tree.tos.ConnectedFilteringByTreeOfShape;
@@ -382,12 +382,12 @@ public class ConnectedFilters extends PlugInFrame implements MouseListener, Acti
 		else if(event.getSource() == applyButtonFilter){
 			if(tree instanceof ComponentTree){
 				if(lastPruning == IMorphologicalTreeFiltering.EXTINCTION_VALUE){
-					boolean selected[] = new ComputerExtinctionValueCT((ComponentTree) tree).getExtinctionValueNodeCT(lastAttributeType, prunedTree);
+					boolean selected[] = new ComputerExtinctionValueComponentTree((ComponentTree) tree).getExtinctionValueNodeCT(lastAttributeType, prunedTree);
 					VisualizationComponentTree.getInstance( prunedTree, selected, null ).setVisible(true);
 				}
 				else if(lastPruning == IMorphologicalTreeFiltering.PRUNING_MSER){
 					//boolean selected[] = new MserCT((ComponentTree) tree).getMappingNodesByMSER(deltaMSER, prunedTree);
-					ComputerTbmrCT tbmr = new ComputerTbmrCT((ComponentTree)tree); 
+					ComputerTbmrComponentTree tbmr = new ComputerTbmrComponentTree((ComponentTree)tree); 
 					boolean selected[] = tbmr.getSelectedNode(100, 9999999);
 					VisualizationComponentTree.getInstance( prunedTree, selected, null ).setVisible(true);
 				}
@@ -397,7 +397,7 @@ public class ConnectedFilters extends PlugInFrame implements MouseListener, Acti
 					VisualizationComponentTree.getInstance( prunedTree, selected, null ).setVisible(true);
 				}
 				else if(lastPruning == IMorphologicalTreeFiltering.PRUNING_TBMR){
-					ComputerTbmrCT tbmr = new ComputerTbmrCT((ComponentTree)tree);
+					ComputerTbmrComponentTree tbmr = new ComputerTbmrComponentTree((ComponentTree)tree);
 					int tMin = 100;
 					int tMax = (int) (tree.getInputImage().getSize() * 0.80);
 					boolean selected[] = tbmr.getSelectedNode(tMin, tMax);
@@ -412,11 +412,11 @@ public class ConnectedFilters extends PlugInFrame implements MouseListener, Acti
 			}
 			else{
 				if(lastPruning == IMorphologicalTreeFiltering.EXTINCTION_VALUE){
-					boolean selected[] = new ComputerExtinctionValueToS((TreeOfShape) tree).getExtinctionValueNode(lastAttributeType, prunedTree);
+					boolean selected[] = new ComputerExtinctionValueTreeOfShapes((TreeOfShape) tree).getExtinctionValueNode(lastAttributeType, prunedTree);
 					VisualizationTreeOfShape.getInstance( prunedTree, selected, null ).setVisible(true);
 				}
 				else if(lastPruning == IMorphologicalTreeFiltering.PRUNING_MSER){
-					boolean selected[] = new ComputerMserToS((TreeOfShape) tree).getMappingNodesByMSER(deltaMSER, prunedTree);
+					boolean selected[] = new ComputerMserTreeOfShapes((TreeOfShape) tree).getMappingNodesByMSER(deltaMSER, prunedTree);
 					VisualizationTreeOfShape.getInstance( prunedTree, selected, null ).setVisible(true);
 				}
 				else{

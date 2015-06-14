@@ -31,10 +31,10 @@ import mmlib4j.images.ColorImage;
 import mmlib4j.images.GrayScaleImage;
 import mmlib4j.representation.tree.IMorphologicalTreeFiltering;
 import mmlib4j.representation.tree.attribute.Attribute;
+import mmlib4j.representation.tree.attribute.ComputerExtinctionValueComponentTree;
+import mmlib4j.representation.tree.attribute.ComputerExtinctionValueTreeOfShapes;
+import mmlib4j.representation.tree.attribute.ComputerExtinctionValue;
 import mmlib4j.representation.tree.componentTree.ConnectedFilteringByComponentTree;
-import mmlib4j.representation.tree.pruningStrategy.ComputerExtinctionValueCT;
-import mmlib4j.representation.tree.pruningStrategy.ComputerExtinctionValueToS;
-import mmlib4j.representation.tree.pruningStrategy.IExtinctionValue;
 import mmlib4j.representation.tree.tos.ConnectedFilteringByTreeOfShape;
 import mmlib4j.segmentation.Labeling;
 import mmlib4j.utils.AdjacencyRelation;
@@ -54,7 +54,7 @@ public class SegmentationBasedExtinctionValues  extends JFrame implements Action
 		private JPanel appPanelEV; 
 		
 		private IMorphologicalTreeFiltering tree;
-		private IExtinctionValue extinctionValue;
+		private ComputerExtinctionValue extinctionValue;
 		private AdjacencyRelation adj4 = AdjacencyRelation.getCircular(1);
 		private AdjacencyRelation adj8 = AdjacencyRelation.getCircular(1.5);
 		private boolean flagLabel = false;
@@ -449,11 +449,11 @@ public class SegmentationBasedExtinctionValues  extends JFrame implements Action
 		
 		public void changeTreeEV(){
 			if(comboTreeEV.getSelectedItem().equals("Max-tree"))
-				extinctionValue = new ComputerExtinctionValueCT(new ConnectedFilteringByComponentTree(imgInput, adj8, true));
+				extinctionValue = new ComputerExtinctionValueComponentTree(new ConnectedFilteringByComponentTree(imgInput, adj8, true));
 			else if(comboTreeEV.getSelectedItem().equals("Min-tree"))
-				extinctionValue = new ComputerExtinctionValueCT(new ConnectedFilteringByComponentTree(imgInput, adj8, false));
+				extinctionValue = new ComputerExtinctionValueComponentTree(new ConnectedFilteringByComponentTree(imgInput, adj8, false));
 			else if(comboTreeEV.getSelectedItem().equals("Tree of shapes"))
-				extinctionValue = new ComputerExtinctionValueToS(new ConnectedFilteringByTreeOfShape(imgInput));
+				extinctionValue = new ComputerExtinctionValueTreeOfShapes(new ConnectedFilteringByTreeOfShape(imgInput));
 			
 			attributeValueEV.setValue(0);
 		}
