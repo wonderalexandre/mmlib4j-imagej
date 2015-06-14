@@ -31,6 +31,7 @@ import mmlib4j.imagej.utils.ImageJAdapter;
 import mmlib4j.images.GrayScaleImage;
 import mmlib4j.representation.tree.IMorphologicalTreeFiltering;
 import mmlib4j.representation.tree.InfoPrunedTree;
+import mmlib4j.representation.tree.attribute.Attribute;
 import mmlib4j.representation.tree.componentTree.ComponentTree;
 import mmlib4j.representation.tree.componentTree.ConnectedFilteringByComponentTree;
 import mmlib4j.representation.tree.componentTree.VisualizationComponentTree;
@@ -250,22 +251,22 @@ public class ConnectedFilters extends PlugInFrame implements MouseListener, Acti
 	
 	public int getAttributeType(){
 		if(comboAttributoFilter.getSelectedItem().equals("Area")){ //area
-			return IMorphologicalTreeFiltering.ATTRIBUTE_AREA;
+			return Attribute.AREA;
 		}
 		else if(comboAttributoFilter.getSelectedItem().equals("Volume")){ //volume
-			return IMorphologicalTreeFiltering.ATTRIBUTE_VOLUME;
+			return Attribute.VOLUME;
 		}
 		else if(comboAttributoFilter.getSelectedItem().equals("Height")){ //Height
-			return IMorphologicalTreeFiltering.ATTRIBUTE_HEIGHT;
+			return Attribute.HEIGHT;
 		}
 		else if(comboAttributoFilter.getSelectedItem().equals("Width")){ //Width
-			return IMorphologicalTreeFiltering.ATTRIBUTE_WIDTH;
+			return Attribute.WIDTH;
 		}
 		else if(comboAttributoFilter.getSelectedItem().equals("Altitude")){ //Width
-			return IMorphologicalTreeFiltering.ATTRIBUTE_ALTITUDE;
+			return Attribute.ALTITUDE;
 		}
 		else if(comboAttributoFilter.getSelectedItem().equals("Length major axes")){ //Width
-			return IMorphologicalTreeFiltering.ATTRIBUTE_MAJOR_AXES;
+			return Attribute.LENGTH_MAJOR_AXES;
 		}
 		else
 			return -1;

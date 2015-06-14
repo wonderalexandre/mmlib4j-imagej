@@ -55,10 +55,10 @@ public class Granulometry  {
 				for(NodeCT node: dist[i]){
 					if(node.getParent() != null){
 						if(tree.isMaxtree()){
-							py[index] -= node.getPixels().size() * Math.abs(node.getLevel() - node.getParent().getLevel());
+							py[index] -= node.getCanonicalPixels().size() * Math.abs(node.getLevel() - node.getParent().getLevel());
 						}
 						else{
-							py[index] += node.getPixels().size() * Math.abs(node.getLevel() - node.getParent().getLevel());
+							py[index] += node.getCanonicalPixels().size() * Math.abs(node.getLevel() - node.getParent().getLevel());
 						}
 						ComponentTree.prunning(tree, node);
 					}
@@ -160,12 +160,12 @@ public class Granulometry  {
 				for(NodeCT node: dist[i-1]){
 					if(node.getParent() != null){
 						if(tree.isMaxtree()){
-							py[index] -= node.getPixels().size() * Math.abs(node.getLevel() - node.getParent().getLevel());
-							pyPS[i] -= node.getPixels().size() * Math.abs(node.getLevel() - node.getParent().getLevel());
+							py[index] -= node.getCanonicalPixels().size() * Math.abs(node.getLevel() - node.getParent().getLevel());
+							pyPS[i] -= node.getCanonicalPixels().size() * Math.abs(node.getLevel() - node.getParent().getLevel());
 						}
 						else{
-							py[index] += node.getPixels().size() * Math.abs(node.getLevel() - node.getParent().getLevel());
-							pyPS[i] += node.getPixels().size() * Math.abs(node.getLevel() - node.getParent().getLevel());
+							py[index] += node.getCanonicalPixels().size() * Math.abs(node.getLevel() - node.getParent().getLevel());
+							pyPS[i] += node.getCanonicalPixels().size() * Math.abs(node.getLevel() - node.getParent().getLevel());
 						}
 						ComponentTree.prunning(tree, node);
 					}
@@ -288,9 +288,9 @@ public class Granulometry  {
 				for(NodeCT node: dist[i]){
 					if(node.getParent() != null){
 						if(tree.isMaxtree())
-							py[i] -= node.getPixels().size() * Math.abs(node.getLevel() - node.getParent().getLevel());
+							py[i] -= node.getCanonicalPixels().size() * Math.abs(node.getLevel() - node.getParent().getLevel());
 						else
-							py[i] += node.getPixels().size() * Math.abs(node.getLevel() - node.getParent().getLevel());
+							py[i] += node.getCanonicalPixels().size() * Math.abs(node.getLevel() - node.getParent().getLevel());
 						ComponentTree.prunning(tree, node);
 					}
 				}

@@ -40,6 +40,7 @@ import mmlib4j.imagej.guj.HistogramOfBranch;
 import mmlib4j.imagej.utils.ImageJAdapter;
 import mmlib4j.images.GrayScaleImage;
 import mmlib4j.representation.tree.IMorphologicalTreeFiltering;
+import mmlib4j.representation.tree.attribute.Attribute;
 import mmlib4j.representation.tree.componentTree.ComponentTree;
 import mmlib4j.representation.tree.componentTree.ConnectedFilteringByComponentTree;
 import mmlib4j.representation.tree.componentTree.VisualizationComponentTree;
@@ -802,19 +803,19 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 	
 	public int getAttributeType(){
 		if(comboAttributoResiduo.getSelectedItem().equals("Area")){
-			return IMorphologicalTreeFiltering.ATTRIBUTE_AREA;
+			return Attribute.AREA;
 		}
 		else if(comboAttributoResiduo.getSelectedItem().equals("Altitude")){ //area
-			return IMorphologicalTreeFiltering.ATTRIBUTE_ALTITUDE;
+			return Attribute.ALTITUDE;
 		}
 		else if(comboAttributoResiduo.getSelectedItem().equals("Volume")){ //volume
-			return IMorphologicalTreeFiltering.ATTRIBUTE_VOLUME;
+			return Attribute.VOLUME;
 		}
 		else if(comboAttributoResiduo.getSelectedItem().equals("Height")){ //Height
-			return IMorphologicalTreeFiltering.ATTRIBUTE_HEIGHT;
+			return Attribute.HEIGHT;
 		}
 		else if(comboAttributoResiduo.getSelectedItem().equals("Width")){ //Height
-			return IMorphologicalTreeFiltering.ATTRIBUTE_WIDTH;
+			return Attribute.WIDTH;
 		}
 		else
 			return -1;

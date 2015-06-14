@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 import mmlib4j.representation.tree.IMorphologicalTreeFiltering;
 import mmlib4j.representation.tree.InfoPrunedTree;
+import mmlib4j.representation.tree.attribute.Attribute;
 import mmlib4j.representation.tree.componentTree.ComponentTree;
 import mmlib4j.representation.tree.componentTree.NodeCT;
 import mmlib4j.representation.tree.pruningStrategy.ComputerExtinctionValueCT;
@@ -997,16 +998,16 @@ public class HistogramOfBranch {
 	}
 
 	public float getAttribute(NodeCT node){
-		if(indexAttr == IMorphologicalTreeFiltering.ATTRIBUTE_AREA)
+		if(indexAttr == Attribute.AREA)
 			return node.getArea();
-		else if(indexAttr == IMorphologicalTreeFiltering.ATTRIBUTE_VOLUME)
-			return node.getAttributeValue(IMorphologicalTreeFiltering.ATTRIBUTE_VOLUME);
-		else if(indexAttr == IMorphologicalTreeFiltering.ATTRIBUTE_HEIGHT)
-			return node.getHeightNode();
-		else if(indexAttr == IMorphologicalTreeFiltering.ATTRIBUTE_WIDTH)
-			return node.getWidthNode();
-		else if(indexAttr == IMorphologicalTreeFiltering.ATTRIBUTE_ALTITUDE)
-			return node.getLevel();
+		else if(indexAttr == Attribute.VOLUME)
+			return (float)node.getAttributeValue(Attribute.VOLUME);
+		else if(indexAttr == Attribute.HEIGHT)
+			return (float)node.getAttributeValue(Attribute.HEIGHT);
+		else if(indexAttr == Attribute.WIDTH)
+			return (float)node.getAttributeValue(Attribute.WIDTH);
+		else if(indexAttr == Attribute.ALTITUDE)
+			return (float)node.getAttributeValue(Attribute.ALTITUDE);
 		return -1;
 	}
 	
@@ -1015,7 +1016,7 @@ public class HistogramOfBranch {
 		if(indexAttr == 0)
 			return node.getArea();
 		else if(indexAttr == 1)
-			return node.getAttributeValue(IMorphologicalTreeFiltering.ATTRIBUTE_VOLUME);
+			return node.getAttributeValueOLD(Attribute.VOLUME);
 		else if(indexAttr == 2)
 			return node.getHeightNode();
 		else

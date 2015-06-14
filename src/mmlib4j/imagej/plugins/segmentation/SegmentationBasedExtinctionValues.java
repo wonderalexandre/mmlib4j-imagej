@@ -30,6 +30,7 @@ import javax.swing.event.ChangeListener;
 import mmlib4j.images.ColorImage;
 import mmlib4j.images.GrayScaleImage;
 import mmlib4j.representation.tree.IMorphologicalTreeFiltering;
+import mmlib4j.representation.tree.attribute.Attribute;
 import mmlib4j.representation.tree.componentTree.ConnectedFilteringByComponentTree;
 import mmlib4j.representation.tree.pruningStrategy.ComputerExtinctionValueCT;
 import mmlib4j.representation.tree.pruningStrategy.ComputerExtinctionValueToS;
@@ -319,23 +320,23 @@ public class SegmentationBasedExtinctionValues  extends JFrame implements Action
 			if(isKmax){
 				if(comboAttributoEV.getSelectedItem().equals("Area")){ //area
 					attributeValue = attributeValueEV.getValue();
-					updateImage(extinctionValue.extinctionByKmax(attributeValue, IMorphologicalTreeFiltering.ATTRIBUTE_AREA));
+					updateImage(extinctionValue.extinctionByKmax(attributeValue, Attribute.AREA));
 				}
 				else if(comboAttributoEV.getSelectedItem().equals("Volume")){ //volume
 					attributeValue = attributeValueEV.getValue();
-					updateImage(extinctionValue.extinctionByKmax(attributeValue, IMorphologicalTreeFiltering.ATTRIBUTE_VOLUME));
+					updateImage(extinctionValue.extinctionByKmax(attributeValue, Attribute.VOLUME));
 				}
 				else if(comboAttributoEV.getSelectedItem().equals("Height")){ //Height
 					attributeValue = attributeValueEV.getValue();
-					updateImage(extinctionValue.extinctionByKmax(attributeValue, IMorphologicalTreeFiltering.ATTRIBUTE_HEIGHT));
+					updateImage(extinctionValue.extinctionByKmax(attributeValue, Attribute.HEIGHT));
 				}
 				else if(comboAttributoEV.getSelectedItem().equals("Width")){ //Width
 					attributeValue = attributeValueEV.getValue();
-					updateImage(extinctionValue.extinctionByKmax(attributeValue, IMorphologicalTreeFiltering.ATTRIBUTE_WIDTH));
+					updateImage(extinctionValue.extinctionByKmax(attributeValue, Attribute.WIDTH));
 				}
 				else if(comboAttributoEV.getSelectedItem().equals("Altitude")){ //Width
 					attributeValue = attributeValueEV.getValue();
-					updateImage(extinctionValue.extinctionByKmax(attributeValue, IMorphologicalTreeFiltering.ATTRIBUTE_ALTITUDE));
+					updateImage(extinctionValue.extinctionByKmax(attributeValue, Attribute.ALTITUDE));
 				}
 			}else{
 				if(comboAttributoEV.getSelectedItem().equals("Area")){ //area
@@ -343,35 +344,35 @@ public class SegmentationBasedExtinctionValues  extends JFrame implements Action
 					attributeValue = (int) Math.floor(Math.pow(imgInput.getSize(), 1-2) * Math.pow(attributeValue, 2)); //funcao potencia
 					attributeValueIni = (int) ((attributeValueEV2.getValue() / 100.0) * imgInput.getSize()/5);
 					attributeValueIni = (int) Math.floor(Math.pow(imgInput.getSize()/5, 1-2) * Math.pow(attributeValueIni, 2)); //funcao potencia
-					updateImage(extinctionValue.extinctionByAttribute(attributeValueIni, attributeValue, IMorphologicalTreeFiltering.ATTRIBUTE_AREA));
+					updateImage(extinctionValue.extinctionByAttribute(attributeValueIni, attributeValue, Attribute.AREA));
 				}
 				else if(comboAttributoEV.getSelectedItem().equals("Volume")){ //volume
 					attributeValue = (int) ((attributeValueEV.getValue() / 100.0) * imgInput.getSize());
 					attributeValue = (int) Math.floor(Math.pow(imgInput.getSize(), 1-2) * Math.pow(attributeValue, 2)); //funcao potencia
 					attributeValueIni = (int) ((attributeValueEV2.getValue() / 100.0) * imgInput.getSize());
 					attributeValueIni = (int) Math.floor(Math.pow(imgInput.getSize(), 1-2) * Math.pow(attributeValueIni, 2)); //funcao potencia
-					updateImage(extinctionValue.extinctionByAttribute(attributeValueIni, attributeValue, IMorphologicalTreeFiltering.ATTRIBUTE_VOLUME));
+					updateImage(extinctionValue.extinctionByAttribute(attributeValueIni, attributeValue, Attribute.VOLUME));
 				}
 				else if(comboAttributoEV.getSelectedItem().equals("Height")){ //Height
 					attributeValue = (int) ((attributeValueEV.getValue() / 100.0) * imgInput.getHeight());
 					attributeValue = (int) Math.floor(Math.pow(imgInput.getHeight(), 1-2) * Math.pow(attributeValue, 2)); //funcao potencia
 					attributeValueIni = (int) ((attributeValueEV2.getValue() / 100.0) * imgInput.getHeight());
 					attributeValueIni = (int) Math.floor(Math.pow(imgInput.getHeight(), 1-2) * Math.pow(attributeValueIni, 2)); //funcao potencia
-					updateImage(extinctionValue.extinctionByAttribute(attributeValueIni, attributeValue, IMorphologicalTreeFiltering.ATTRIBUTE_HEIGHT));
+					updateImage(extinctionValue.extinctionByAttribute(attributeValueIni, attributeValue, Attribute.HEIGHT));
 				}
 				else if(comboAttributoEV.getSelectedItem().equals("Width")){ //Width
 					attributeValue = (int) ((attributeValueEV.getValue() / 100.0) * imgInput.getWidth());
 					attributeValue = (int) Math.floor(Math.pow(imgInput.getWidth(), 1-2) * Math.pow(attributeValue, 2)); //funcao potencia
 					attributeValueIni = (int) ((attributeValueEV2.getValue() / 100.0) * imgInput.getWidth());
 					attributeValueIni = (int) Math.floor(Math.pow(imgInput.getWidth(), 1-2) * Math.pow(attributeValueIni, 2)); //funcao potencia
-					updateImage(extinctionValue.extinctionByAttribute(attributeValueIni, attributeValue, IMorphologicalTreeFiltering.ATTRIBUTE_WIDTH));
+					updateImage(extinctionValue.extinctionByAttribute(attributeValueIni, attributeValue, Attribute.WIDTH));
 				}
 				else if(comboAttributoEV.getSelectedItem().equals("Altitude")){ //Width
 					attributeValue = (int) ((attributeValueEV.getValue() / 100.0) * 200);
 					attributeValue = (int) Math.floor(Math.pow(200, 1-2) * Math.pow(attributeValue, 2)); //funcao potencia
 					attributeValueIni = (int) ((attributeValueEV2.getValue() / 100.0) * 200);
 					attributeValueIni = (int) Math.floor(Math.pow(200, 1-2) * Math.pow(attributeValueIni, 2)); //funcao potencia
-					updateImage(extinctionValue.extinctionByAttribute(attributeValueIni, attributeValue, IMorphologicalTreeFiltering.ATTRIBUTE_ALTITUDE));
+					updateImage(extinctionValue.extinctionByAttribute(attributeValueIni, attributeValue, Attribute.ALTITUDE));
 				}	
 			}
 			limiarLabelEV.setText("value: (to) :" + attributeValue);
@@ -385,23 +386,23 @@ public class SegmentationBasedExtinctionValues  extends JFrame implements Action
 			if(isKmax){
 				if(comboAttributoEV.getSelectedItem().equals("Area")){ //area
 					attributeValue = attributeValueEV.getValue();
-					updateImage(extinctionValue.segmentationByKmax(attributeValue, IMorphologicalTreeFiltering.ATTRIBUTE_AREA).randomColor());
+					updateImage(extinctionValue.segmentationByKmax(attributeValue, Attribute.AREA).randomColor());
 				}
 				else if(comboAttributoEV.getSelectedItem().equals("Volume")){ //volume
 					attributeValue = attributeValueEV.getValue();
-					updateImage(extinctionValue.segmentationByKmax(attributeValue, IMorphologicalTreeFiltering.ATTRIBUTE_VOLUME).randomColor());
+					updateImage(extinctionValue.segmentationByKmax(attributeValue, Attribute.VOLUME).randomColor());
 				}
 				else if(comboAttributoEV.getSelectedItem().equals("Height")){ //Height
 					attributeValue = attributeValueEV.getValue();
-					updateImage(extinctionValue.segmentationByKmax(attributeValue, IMorphologicalTreeFiltering.ATTRIBUTE_HEIGHT).randomColor());
+					updateImage(extinctionValue.segmentationByKmax(attributeValue, Attribute.HEIGHT).randomColor());
 				}
 				else if(comboAttributoEV.getSelectedItem().equals("Width")){ //Width
 					attributeValue = attributeValueEV.getValue();
-					updateImage(extinctionValue.segmentationByKmax(attributeValue, IMorphologicalTreeFiltering.ATTRIBUTE_WIDTH).randomColor());
+					updateImage(extinctionValue.segmentationByKmax(attributeValue, Attribute.WIDTH).randomColor());
 				}
 				else if(comboAttributoEV.getSelectedItem().equals("Altitude")){ //Width
 					attributeValue = attributeValueEV.getValue();
-					updateImage(extinctionValue.segmentationByKmax(attributeValue, IMorphologicalTreeFiltering.ATTRIBUTE_ALTITUDE).randomColor());
+					updateImage(extinctionValue.segmentationByKmax(attributeValue, Attribute.ALTITUDE).randomColor());
 				}
 			}else{
 				if(comboAttributoEV.getSelectedItem().equals("Area")){ //area
@@ -410,35 +411,35 @@ public class SegmentationBasedExtinctionValues  extends JFrame implements Action
 					attributeValueIni = (int) ((attributeValueEV2.getValue() / 100.0) * imgInput.getSize()/5);
 					attributeValueIni = (int) Math.floor(Math.pow(imgInput.getSize()/5, 1-2) * Math.pow(attributeValueIni, 2)); //funcao potencia
 					
-					updateImage(extinctionValue.segmentationByAttribute(attributeValueIni, attributeValue, IMorphologicalTreeFiltering.ATTRIBUTE_AREA).randomColor());
+					updateImage(extinctionValue.segmentationByAttribute(attributeValueIni, attributeValue, Attribute.AREA).randomColor());
 				}
 				else if(comboAttributoEV.getSelectedItem().equals("Volume")){ //volume
 					attributeValue = (int) ((attributeValueEV.getValue() / 100.0) * imgInput.getSize());
 					attributeValue = (int) Math.floor(Math.pow(imgInput.getSize(), 1-2) * Math.pow(attributeValue, 2)); //funcao potencia
 					attributeValueIni = (int) ((attributeValueEV2.getValue() / 100.0) * imgInput.getSize());
 					attributeValueIni = (int) Math.floor(Math.pow(imgInput.getSize(), 1-2) * Math.pow(attributeValueIni, 2)); //funcao potencia
-					updateImage(extinctionValue.segmentationByAttribute(attributeValueIni, attributeValue, IMorphologicalTreeFiltering.ATTRIBUTE_VOLUME).randomColor());
+					updateImage(extinctionValue.segmentationByAttribute(attributeValueIni, attributeValue, Attribute.VOLUME).randomColor());
 				}
 				else if(comboAttributoEV.getSelectedItem().equals("Height")){ //Height
 					attributeValue = (int) ((attributeValueEV.getValue() / 100.0) * imgInput.getHeight());
 					attributeValue = (int) Math.floor(Math.pow(imgInput.getHeight(), 1-2) * Math.pow(attributeValue, 2)); //funcao potencia
 					attributeValueIni = (int) ((attributeValueEV2.getValue() / 100.0) * imgInput.getHeight());
 					attributeValueIni = (int) Math.floor(Math.pow(imgInput.getHeight(), 1-2) * Math.pow(attributeValueIni, 2)); //funcao potencia
-					updateImage(extinctionValue.segmentationByAttribute(attributeValueIni, attributeValue, IMorphologicalTreeFiltering.ATTRIBUTE_HEIGHT).randomColor());
+					updateImage(extinctionValue.segmentationByAttribute(attributeValueIni, attributeValue, Attribute.HEIGHT).randomColor());
 				}
 				else if(comboAttributoEV.getSelectedItem().equals("Width")){ //Width
 					attributeValue = (int) ((attributeValueEV.getValue() / 100.0) * imgInput.getWidth());
 					attributeValue = (int) Math.floor(Math.pow(imgInput.getWidth(), 1-2) * Math.pow(attributeValue, 2)); //funcao potencia
 					attributeValueIni = (int) ((attributeValueEV2.getValue() / 100.0) * imgInput.getWidth());
 					attributeValueIni = (int) Math.floor(Math.pow(imgInput.getWidth(), 1-2) * Math.pow(attributeValueIni, 2)); //funcao potencia
-					updateImage(extinctionValue.segmentationByAttribute(attributeValueIni, attributeValue, IMorphologicalTreeFiltering.ATTRIBUTE_WIDTH).randomColor());
+					updateImage(extinctionValue.segmentationByAttribute(attributeValueIni, attributeValue, Attribute.WIDTH).randomColor());
 				}
 				else if(comboAttributoEV.getSelectedItem().equals("Altitude")){ //Width
 					attributeValue = (int) ((attributeValueEV.getValue() / 100.0) * 200);
 					attributeValue = (int) Math.floor(Math.pow(200, 1-2) * Math.pow(attributeValue, 2)); //funcao potencia
 					attributeValueIni = (int) ((attributeValueEV2.getValue() / 100.0) * 200);
 					attributeValueIni = (int) Math.floor(Math.pow(200, 1-2) * Math.pow(attributeValueIni, 2)); //funcao potencia
-					updateImage(extinctionValue.segmentationByAttribute(attributeValueIni, attributeValue, IMorphologicalTreeFiltering.ATTRIBUTE_ALTITUDE).randomColor());
+					updateImage(extinctionValue.segmentationByAttribute(attributeValueIni, attributeValue, Attribute.ALTITUDE).randomColor());
 				}	
 			}
 			limiarLabelEV.setText("value: (to) :" + attributeValue);
