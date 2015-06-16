@@ -1,14 +1,17 @@
 package mmlib4j.imagej.plugins.residual;
 
 import ij.IJ;
+import ij.ImageListener;
 import ij.ImagePlus;
 import ij.WindowManager;
 import ij.gui.GUI;
+import ij.gui.GenericDialog;
 import ij.plugin.frame.PlugInFrame;
 import ij.process.ByteProcessor;
 
 import java.awt.Cursor;
 import java.awt.GridLayout;
+import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -25,6 +28,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JToggleButton;
+import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -81,19 +85,44 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 	private AdjacencyRelation adj8 = AdjacencyRelation.getCircular(1.5);
 	private boolean flagLabel = false;
 	private boolean flagColor = false;
-	
+	private MappingStrategyOfPruning pruning = null;
 	private ImagePlus imgPlus;
 	
 	private String titleImg;
 	
+	private class ParamElongation{
+		double elong;
+		int areaMin;
+		int areaMax;
+		ParamElongation(double e, int min, int max){elong = e; areaMin=min; areaMax=max;}
+	}
+	private ParamElongation paramElongation;
+	
 	public UltimateLevelings(ImagePlus plus) {
-		super("MMorph4J: Ultimate Levelings");
+		super("Ultimate Levelings - " + plus.getTitle());
 		super.setSize(335, 720);
-		
+		try {
+			UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
 		this.imgPlus = plus;
+		
+		imgPlus.addImageListener(new ImageListener() {
+			public void imageUpdated(ImagePlus imp) {}
+			public void imageOpened(ImagePlus imp) {}
+			public void imageClosed(ImagePlus imp) {
+				if(imp == imgPlus)
+					close();
+			}
+		});
+		
 		this.titleImg = plus.getTitle();
 		this.imgInput = ImageJAdapter.toGrayScaleImage( (ByteProcessor) plus.getProcessor());
 		this.setMenuBar( IJ.getInstance().getMenuBar() );
+		
+		paramElongation = new ParamElongation(0.7, 50, imgInput.getSize());
+		
 		imgInputOriginal = imgInput.duplicate();
 		
 		Thread t1 = new Thread(new Runnable() {
@@ -126,7 +155,7 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 		this.imgCurrent = imgInput.duplicate();
 		//imgPlus.getCanvas().addMouseListener(this);
 		
-		JPanel appPanelResiduo = createPanelResidualOperator(true);
+		Panel appPanelResiduo = createPanelResidualOperator(true);
         super.add(appPanelResiduo);
 
         WindowManager.addWindow(this);
@@ -275,7 +304,7 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 	private JComboBox comboInfoResiduo;
 	private JButton reloadButtonResiduo;
 	private JButton applyButtonFilter;
-	private JToggleButton applyButtonGrad;
+	private JButton applyButtonGrad;
 	private JButton applyButtonContrast;
 	private JButton applyButtonGranulometry;
 	private JToggleButton analisysButton;
@@ -286,8 +315,8 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 	private JSlider paramDeltaOfPruningStrategies;
 	private JSlider paramDeltaOfFilter;
 	private JLabel limiarLabelResiduo;
-	public JPanel createPanelResidualOperator(boolean visib){
-		JPanel appPanelResiduo = new JPanel(new GridLayout(10, 1, 0, 0));
+	public Panel createPanelResidualOperator(boolean visib){
+		Panel appPanelResiduo = new Panel(new GridLayout(10, 1, 0, 0));
 		
 		//1
 		comboResiduo = new JComboBox();
@@ -420,7 +449,7 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 		analisysButton = new JToggleButton("Residual evolution");
 		applyButtonContrast = new JButton("Contrast Enhancement");
 		applyButtonGranulometry = new JButton("Primitives"); //Granulometries
-		applyButtonGrad = new JToggleButton("Gradient");
+		applyButtonGrad = new JButton("Parameters");
 		applyButtonFilter.addActionListener(this);
 		reloadButtonResiduo.addActionListener(this);
 		analisysButton.addActionListener(this);
@@ -523,6 +552,7 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 	}
 	
 	
+	
 	public boolean[] getFilteringResidues(){
 		if(this.tree instanceof ComponentTree){
 			//ComponentTree tree = (ComponentTree) this.tree;
@@ -552,7 +582,9 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 			else if(pruningSelected.equals("---- Elongation ----")){
 				System.out.println("ComponentTree - MSER with elongation");
 				int delta = paramDeltaOfFilter.getValue();
-				return new PruningBasedMSERWithElongation(this.tree, delta).getMappingSelectedNodes();
+				pruning = new PruningBasedMSERWithElongation(this.tree, delta);
+				((PruningBasedMSERWithElongation)pruning).setParametersElongationFunction(paramElongation.areaMin, paramElongation.areaMax, paramElongation.elong);
+				return pruning.getMappingSelectedNodes();
 			}
 			
 			
@@ -616,12 +648,19 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 			flagLabel = false;
 		}
 		else if(e.getSource() == applyButtonGrad){
-			if(applyButtonGrad.isSelected()){
-				imgInput = MorphologicalOperators.gradient(imgInputOriginal, adj8);
-			}else{
-				imgInput = imgInputOriginal.duplicate();
+			if(pruning != null && pruning instanceof PruningBasedMSERWithElongation){
+				GenericDialog gd = new GenericDialog("Parameters", this);
+				gd.addNumericField("Elongation (0 to 1)", paramElongation.elong, 3);
+				gd.addNumericField("Area (min)", paramElongation.areaMin, 0);
+				gd.addNumericField("Area (max)", paramElongation.areaMax, 0);
+				gd.showDialog();
+				if (!gd.wasCanceled()){
+					paramElongation.elong = gd.getNextNumber();
+					paramElongation.areaMin = (int) gd.getNextNumber();
+					paramElongation.areaMax = (int) gd.getNextNumber();
+					updateExtractionResidues();
+				}
 			}
-			updateImage(imgInput);
 		}
 		
 		else if(e.getSource() == applyButtonGranulometry){
@@ -1162,6 +1201,9 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 	public void windowActivated(WindowEvent e) { }
 	@Override
 	public void windowDeactivated(WindowEvent e) { }
+	
+
+	
 	
 	
 }

@@ -41,8 +41,8 @@ public class HDomes_by_reconstruction implements PlugInFilter {
  		 gd.addNumericField("parameter filter (h)", 5, 0);
  		
  		 gd.showDialog();
-          if (gd.wasCanceled())
-             return false;
+ 		 if (gd.wasCanceled())
+ 			 return false;
 
 
  		raio = gd.getNextNumber();
