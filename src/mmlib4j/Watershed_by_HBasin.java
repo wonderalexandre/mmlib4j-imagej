@@ -12,7 +12,12 @@ import mmlib4j.imagej.utils.ImageUtils;
 import mmlib4j.images.GrayScaleImage;
 import mmlib4j.segmentation.WatershedByIFT;
 
-
+/**
+ * MMLib4J - Mathematical Morphology Library for Java 
+ * @author Wonder Alexandre Luz Alves
+ *
+ * Graphic User Interface by ImageJ
+ */
 public class Watershed_by_HBasin implements PlugInFilter{
 	int level;
 	

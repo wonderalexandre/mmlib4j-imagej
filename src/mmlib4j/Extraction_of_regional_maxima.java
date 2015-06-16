@@ -10,7 +10,12 @@ import mmlib4j.imagej.utils.ImageJAdapter;
 import mmlib4j.images.GrayScaleImage;
 import mmlib4j.segmentation.RegionalMinimaByIFT;
 
-
+/**
+ * MMLib4J - Mathematical Morphology Library for Java 
+ * @author Wonder Alexandre Luz Alves
+ *
+ * Graphic User Interface by ImageJ
+ */
 public class Extraction_of_regional_maxima implements PlugInFilter {
 	
 	

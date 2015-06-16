@@ -37,13 +37,14 @@ import mmlib4j.gui.WindowImages;
 import mmlib4j.imagej.guj.EvolutionResidue;
 import mmlib4j.imagej.guj.Granulometry;
 import mmlib4j.imagej.guj.HistogramOfBranch;
+import mmlib4j.imagej.guj.VisualizationComponentTree;
+import mmlib4j.imagej.guj.VisualizationTreeOfShape;
 import mmlib4j.imagej.utils.ImageJAdapter;
 import mmlib4j.images.GrayScaleImage;
 import mmlib4j.representation.tree.IMorphologicalTreeFiltering;
 import mmlib4j.representation.tree.attribute.Attribute;
 import mmlib4j.representation.tree.componentTree.ComponentTree;
 import mmlib4j.representation.tree.componentTree.ConnectedFilteringByComponentTree;
-import mmlib4j.representation.tree.componentTree.VisualizationComponentTree;
 import mmlib4j.representation.tree.pruningStrategy.MappingStrategyOfPruning;
 import mmlib4j.representation.tree.pruningStrategy.PruningBasedAttribute;
 import mmlib4j.representation.tree.pruningStrategy.PruningBasedExtinctionValue;
@@ -55,12 +56,17 @@ import mmlib4j.representation.tree.pruningStrategy.PruningBasedMSERWithTextLocat
 import mmlib4j.representation.tree.pruningStrategy.PruningBasedTBMR;
 import mmlib4j.representation.tree.tos.ConnectedFilteringByTreeOfShape;
 import mmlib4j.representation.tree.tos.TreeOfShape;
-import mmlib4j.representation.tree.tos.VisualizationTreeOfShape;
 import mmlib4j.segmentation.Labeling;
 import mmlib4j.segmentation.WatershedByIFT;
 import mmlib4j.utils.AdjacencyRelation;
 import mmlib4j.utils.ImageAlgebra;
 
+/**
+ * MMLib4J - Mathematical Morphology Library for Java 
+ * @author Wonder Alexandre Luz Alves
+ *
+ * Graphic User Interface by ImageJ
+ */
 public class UltimateLevelings  extends PlugInFrame implements ActionListener, ChangeListener,  WindowListener, MouseListener {
 	
 	private static final long serialVersionUID = 1L;
@@ -541,13 +547,11 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 			else if(pruningSelected.equals("---- Circularity ----")){
 				System.out.println("ComponentTree - MSER with circularity");
 				int delta = paramDeltaOfFilter.getValue();
-				((ConnectedFilteringByComponentTree) this.tree).setContours(false);
 				return new PruningBasedMSERWithCircularity(this.tree, delta).getMappingSelectedNodes();
 			}
 			else if(pruningSelected.equals("---- Elongation ----")){
 				System.out.println("ComponentTree - MSER with elongation");
 				int delta = paramDeltaOfFilter.getValue();
-				((ConnectedFilteringByComponentTree) this.tree).setContours(false);
 				return new PruningBasedMSERWithElongation(this.tree, delta).getMappingSelectedNodes();
 			}
 			

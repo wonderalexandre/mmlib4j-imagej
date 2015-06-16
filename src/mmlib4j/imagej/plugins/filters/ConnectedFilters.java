@@ -27,6 +27,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import mmlib4j.imagej.guj.HistogramOfBranch;
+import mmlib4j.imagej.guj.VisualizationComponentTree;
+import mmlib4j.imagej.guj.VisualizationTreeOfShape;
 import mmlib4j.imagej.utils.ImageJAdapter;
 import mmlib4j.images.GrayScaleImage;
 import mmlib4j.representation.tree.IMorphologicalTreeFiltering;
@@ -38,16 +40,20 @@ import mmlib4j.representation.tree.attribute.ComputerMserTreeOfShapes;
 import mmlib4j.representation.tree.attribute.ComputerTbmrComponentTree;
 import mmlib4j.representation.tree.componentTree.ComponentTree;
 import mmlib4j.representation.tree.componentTree.ConnectedFilteringByComponentTree;
-import mmlib4j.representation.tree.componentTree.VisualizationComponentTree;
 import mmlib4j.representation.tree.pruningStrategy.PruningBasedAttribute;
 import mmlib4j.representation.tree.pruningStrategy.PruningBasedGradualTransition;
 import mmlib4j.representation.tree.tos.ConnectedFilteringByTreeOfShape;
 import mmlib4j.representation.tree.tos.TreeOfShape;
-import mmlib4j.representation.tree.tos.VisualizationTreeOfShape;
 import mmlib4j.segmentation.Labeling;
 import mmlib4j.utils.AdjacencyRelation;
 import mmlib4j.utils.ImageAlgebra;
 
+/**
+ * MMLib4J - Mathematical Morphology Library for Java 
+ * @author Wonder Alexandre Luz Alves
+ *
+ * Graphic User Interface by ImageJ
+ */
 public class ConnectedFilters extends PlugInFrame implements MouseListener, ActionListener, ChangeListener, WindowListener {
 	
 	private static final long serialVersionUID = 2712059893881609948L;
@@ -266,7 +272,7 @@ public class ConnectedFilters extends PlugInFrame implements MouseListener, Acti
 			return Attribute.ALTITUDE;
 		}
 		else if(comboAttributoFilter.getSelectedItem().equals("Length major axes")){ //Width
-			return Attribute.LENGTH_MAJOR_AXES;
+			return Attribute.MOMENT_LENGTH_MAJOR_AXES;
 		}
 		else
 			return -1;

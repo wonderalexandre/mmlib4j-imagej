@@ -12,7 +12,12 @@ import mmlib4j.imagej.utils.ImageUtils;
 import mmlib4j.images.GrayScaleImage;
 import mmlib4j.utils.AdjacencyRelation;
 
-
+/**
+ * MMLib4J - Mathematical Morphology Library for Java 
+ * @author Wonder Alexandre Luz Alves
+ *
+ * Graphic User Interface by ImageJ
+ */
 public class Black_TopHat implements PlugInFilter {
 	
 	double raio;

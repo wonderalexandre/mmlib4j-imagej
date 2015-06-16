@@ -7,7 +7,12 @@ import ij.plugin.filter.PlugInFilter;
 import ij.process.ImageProcessor;
 import mmlib4j.imagej.utils.ImageUtils;
 
-
+/**
+ * MMLib4J - Mathematical Morphology Library for Java 
+ * @author Wonder Alexandre Luz Alves
+ *
+ * Graphic User Interface by ImageJ
+ */
 public class Replace_level implements PlugInFilter{
 	int levelOld;
 	int levelNew;

@@ -12,6 +12,12 @@ import java.io.File;
 import mmlib4j.images.ColorImage;
 import mmlib4j.utils.ImageBuilder;
 
+/**
+ * MMLib4J - Mathematical Morphology Library for Java 
+ * @author Wonder Alexandre Luz Alves
+ *
+ * Graphic User Interface by ImageJ
+ */
 public class ConverterTipoImagem {
 
 	public static void main(String[] args) {

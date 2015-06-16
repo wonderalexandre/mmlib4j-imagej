@@ -26,7 +26,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import mmlib4j.filtering.MorphologicalOperators;
-import mmlib4j.gui.ComboBoxColor;
+import mmlib4j.imagej.guj.ComboBoxColor;
 import mmlib4j.imagej.utils.ImageJAdapter;
 import mmlib4j.images.GrayScaleImage;
 import mmlib4j.images.impl.ImageFactory;
@@ -34,6 +34,12 @@ import mmlib4j.segmentation.LiveWireIFT;
 import mmlib4j.utils.AdjacencyRelation;
 import mmlib4j.utils.ImageUtils;
 
+/**
+ * MMLib4J - Mathematical Morphology Library for Java 
+ * @author Wonder Alexandre Luz Alves
+ *
+ * Graphic User Interface by ImageJ
+ */
 public class LiveWireByIFT extends PlugInFrame implements MouseListener, ActionListener, MouseMotionListener, WindowListener {
 
 	/* Current mouse coordinates */

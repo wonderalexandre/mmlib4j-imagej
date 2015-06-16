@@ -2,6 +2,12 @@ package mmlib4j.imagej.utils;
 import ij.ImageJ;
 
 
+/**
+ * MMLib4J - Mathematical Morphology Library for Java 
+ * @author Wonder Alexandre Luz Alves
+ *
+ * Graphic User Interface by ImageJ
+ */
 public class ImageJTest {
 
 	public static void main(String[] args) {

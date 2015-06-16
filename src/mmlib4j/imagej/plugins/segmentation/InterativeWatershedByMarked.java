@@ -31,7 +31,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import mmlib4j.filtering.MorphologicalOperators;
-import mmlib4j.gui.ComboBoxColor;
+import mmlib4j.imagej.guj.ComboBoxColor;
 import mmlib4j.imagej.utils.ImageJAdapter;
 import mmlib4j.images.ColorImage;
 import mmlib4j.images.GrayScaleImage;
@@ -42,6 +42,12 @@ import mmlib4j.utils.AdjacencyRelation;
 import mmlib4j.utils.ImageBuilder;
 import mmlib4j.utils.ImageUtils;
 
+/**
+ * MMLib4J - Mathematical Morphology Library for Java 
+ * @author Wonder Alexandre Luz Alves
+ *
+ * Graphic User Interface by ImageJ
+ */
 public class InterativeWatershedByMarked extends PlugInFrame implements MouseListener, ActionListener, MouseMotionListener, WindowListener, ChangeListener {
 	
 	private int mousex = 0;

@@ -1,10 +1,5 @@
 package mmlib4j;
 
-
-
-
-
-
 import ij.IJ;
 import ij.ImagePlus;
 import ij.WindowManager;
@@ -17,6 +12,12 @@ import mmlib4j.images.GrayScaleImage;
 import mmlib4j.utils.AdjacencyRelation;
 import mmlib4j.utils.ImageAlgebra;
 
+/**
+ * MMLib4J - Mathematical Morphology Library for Java 
+ * @author Wonder Alexandre Luz Alves
+ *
+ * Graphic User Interface by ImageJ
+ */
 public class Binary_relation implements PlugInFilter {
 	
 	ByteProcessor imgF;

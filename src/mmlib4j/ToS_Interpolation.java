@@ -13,6 +13,12 @@ import mmlib4j.images.ColorImage;
 import mmlib4j.images.GrayScaleImage;
 import mmlib4j.representation.tree.tos.BuilderTreeOfShapeByUnionFindParallel;
 
+/**
+ * MMLib4J - Mathematical Morphology Library for Java 
+ * @author Wonder Alexandre Luz Alves
+ *
+ * Graphic User Interface by ImageJ
+ */
 public class ToS_Interpolation  implements PlugInFilter {
 	
 	public void run(ImageProcessor ip) { 

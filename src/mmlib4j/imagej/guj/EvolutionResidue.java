@@ -15,6 +15,12 @@ import mmlib4j.imagej.utils.ImageJAdapter;
 import mmlib4j.representation.tree.componentTree.ComponentTree;
 import mmlib4j.representation.tree.componentTree.NodeCT;
 
+/**
+ * MMLib4J - Mathematical Morphology Library for Java 
+ * @author Wonder Alexandre Luz Alves
+ *
+ * Graphic User Interface by ImageJ
+ */
 public class EvolutionResidue {
 
 	NodeCT nodeSelected;

@@ -18,6 +18,12 @@ import mmlib4j.representation.tree.pruningStrategy.PruningBasedGradualTransition
 import mmlib4j.representation.tree.tos.NodeToS;
 import mmlib4j.representation.tree.tos.TreeOfShape;
 
+/**
+ * MMLib4J - Mathematical Morphology Library for Java 
+ * @author Wonder Alexandre Luz Alves
+ *
+ * Graphic User Interface by ImageJ
+ */
 public class HistogramOfBranch {
 
 	private int indexAttr;
@@ -1016,10 +1022,10 @@ public class HistogramOfBranch {
 		if(indexAttr == 0)
 			return node.getArea();
 		else if(indexAttr == 1)
-			return node.getAttributeValueOLD(Attribute.VOLUME);
+			return (int) node.getAttributeValue(Attribute.VOLUME);
 		else if(indexAttr == 2)
-			return node.getHeightNode();
+			return (int) node.getAttributeValue(Attribute.HEIGHT);
 		else
-			return node.getWidthNode();
+			return (int) node.getAttributeValue(Attribute.WIDTH);
 	}
 }

@@ -15,7 +15,12 @@ import mmlib4j.segmentation.RegionalMinimaByIFT;
 import mmlib4j.segmentation.WatershedByIFT;
 import mmlib4j.utils.AdjacencyRelation;
 
-
+/**
+ * MMLib4J - Mathematical Morphology Library for Java 
+ * @author Wonder Alexandre Luz Alves
+ *
+ * Graphic User Interface by ImageJ
+ */
 public class Watershed_based_minima implements PlugInFilter {
 	
 	boolean gradient;

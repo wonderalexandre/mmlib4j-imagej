@@ -1,17 +1,17 @@
 package mmlib4j;
 
-
-
-
-
-
 import ij.ImagePlus;
 import ij.plugin.filter.PlugInFilter;
 import ij.process.ImageProcessor;
 import mmlib4j.imagej.plugins.filters.ConnectedFilters;
 import mmlib4j.imagej.utils.ImageUtils;
 
-
+/**
+ * MMLib4J - Mathematical Morphology Library for Java 
+ * @author Wonder Alexandre Luz Alves
+ *
+ * Graphic User Interface by ImageJ
+ */
 public class Grain_filters implements PlugInFilter {
 
 	private ImagePlus plus;

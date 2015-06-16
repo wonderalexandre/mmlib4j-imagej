@@ -14,6 +14,12 @@ import mmlib4j.images.RealImage;
 import mmlib4j.images.impl.BitImage;
 import mmlib4j.images.impl.ImageFactory;
 
+/**
+ * MMLib4J - Mathematical Morphology Library for Java 
+ * @author Wonder Alexandre Luz Alves
+ *
+ * Graphic User Interface by ImageJ
+ */
 public class ImageJAdapter {
 	
 	public static GrayScaleImage toGrayScaleImage(ByteProcessor ip){

@@ -40,6 +40,12 @@ import mmlib4j.segmentation.Labeling;
 import mmlib4j.utils.AdjacencyRelation;
 import mmlib4j.utils.ImageBuilder;
 
+/**
+ * MMLib4J - Mathematical Morphology Library for Java 
+ * @author Wonder Alexandre Luz Alves
+ *
+ * Graphic User Interface by ImageJ
+ */
 public class SegmentationBasedExtinctionValues  extends JFrame implements ActionListener, ChangeListener, MouseMotionListener, ItemListener, MouseListener {
 
 		

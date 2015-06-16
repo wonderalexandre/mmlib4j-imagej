@@ -9,6 +9,12 @@ import mmlib4j.images.GrayScaleImage;
 import mmlib4j.images.Image2D;
 import mmlib4j.images.RealImage;
 
+/**
+ * MMLib4J - Mathematical Morphology Library for Java 
+ * @author Wonder Alexandre Luz Alves
+ *
+ * Graphic User Interface by ImageJ
+ */
 public class ImageUtils {
 	
 	private static WindowImages win = null;

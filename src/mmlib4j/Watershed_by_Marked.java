@@ -1,10 +1,5 @@
 package mmlib4j;
 
-
-
-
-
-
 import ij.IJ;
 import ij.ImagePlus;
 import ij.WindowManager;
@@ -25,6 +20,12 @@ import mmlib4j.images.impl.ImageFactory;
 import mmlib4j.segmentation.WatershedByIFT;
 import mmlib4j.utils.AdjacencyRelation;
 
+/**
+ * MMLib4J - Mathematical Morphology Library for Java 
+ * @author Wonder Alexandre Luz Alves
+ *
+ * Graphic User Interface by ImageJ
+ */
 public class Watershed_by_Marked implements PlugInFilter {
 	
 	ByteProcessor imgF;

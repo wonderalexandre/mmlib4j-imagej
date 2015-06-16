@@ -10,7 +10,12 @@ import mmlib4j.imagej.utils.ImageJAdapter;
 import mmlib4j.images.GrayScaleImage;
 import mmlib4j.representation.tree.componentTree.ReconstructionMorphological;
 import mmlib4j.utils.AdjacencyRelation;
-
+/**
+ * MMLib4J - Mathematical Morphology Library for Java 
+ * @author Wonder Alexandre Luz Alves
+ *
+ * Graphic User Interface by ImageJ
+ */
 public class Opening_by_reconstruction implements PlugInFilter {
 	
 	double raio;

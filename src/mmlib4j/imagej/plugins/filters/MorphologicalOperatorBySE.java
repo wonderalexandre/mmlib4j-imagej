@@ -32,6 +32,12 @@ import mmlib4j.representation.tree.componentTree.ReconstructionMorphological;
 import mmlib4j.segmentation.Labeling;
 import mmlib4j.utils.AdjacencyRelation;
 
+/**
+ * MMLib4J - Mathematical Morphology Library for Java 
+ * @author Wonder Alexandre Luz Alves
+ *
+ * Graphic User Interface by ImageJ
+ */
 public class MorphologicalOperatorBySE  extends PlugInFrame implements ActionListener, ChangeListener {
 	
 	private static final long serialVersionUID = -6046850754334555050L;
