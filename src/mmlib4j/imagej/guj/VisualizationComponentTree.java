@@ -152,12 +152,13 @@ public class VisualizationComponentTree extends JPanel {
 	public void addTable(ResultsTable rt, NodeCT v){
 		rt.incrementCounter();
 		rt.addValue("PIXEL_CANONICAL", v.getCanonicalPixel());
+		rt.addValue("LEVEL", v.getAttributeValue(Attribute.LEVEL));
 		rt.addValue("AREA", v.getAttributeValue(Attribute.AREA));
 		rt.addValue("VOLUME", v.getAttributeValue(Attribute.VOLUME));
 		rt.addValue("ALTITUDE", v.getAttributeValue(Attribute.ALTITUDE));
 		rt.addValue("HEIGHT", v.getAttributeValue(Attribute.HEIGHT));
 		rt.addValue("WIDTH", v.getAttributeValue(Attribute.WIDTH));
-		//rt.addValue("VARIANCE_LEVEL", v.getAttributeValue(Attribute.VARIANCE_LEVEL));
+		rt.addValue("VARIANCE_LEVEL", v.getAttributeValue(Attribute.VARIANCE_LEVEL));
 		rt.addValue("NUM_HOLES", v.getAttributeValue(Attribute.NUM_HOLES));
 		rt.addValue("PERIMETER", v.getAttributeValue(Attribute.PERIMETER));
 		rt.addValue("PERIMETER_EXTERNAL", v.getAttributeValue(Attribute.PERIMETER_EXTERNAL));
@@ -165,6 +166,7 @@ public class VisualizationComponentTree extends JPanel {
 		rt.addValue("COMPACTNESS", v.getAttributeValue(Attribute.COMPACTNESS));
 		rt.addValue("ELONGATION", v.getAttributeValue(Attribute.ELONGATION));
 		rt.addValue("RECTANGULARITY", v.getAttributeValue(Attribute.RECTANGULARITY));
+		rt.addValue("RATIO_WIDTH_HEIGHT", v.getAttributeValue(Attribute.RATIO_WIDTH_HEIGHT));
 		rt.addValue("MOMENT_ASPECT_RATIO", v.getAttributeValue(Attribute.MOMENT_ASPECT_RATIO));
 		rt.addValue("MOMENT_COMPACTNESS", v.getAttributeValue(Attribute.MOMENT_COMPACTNESS));
 		rt.addValue("MOMENT_ECCENTRICITY", v.getAttributeValue(Attribute.MOMENT_ECCENTRICITY));
