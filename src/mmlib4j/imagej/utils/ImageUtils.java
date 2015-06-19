@@ -49,6 +49,8 @@ public class ImageUtils {
 						plus[i].show();
 					}
 				}
+
+				public void close() {}
 			};
 			WindowImages.instance = win;
 		}

@@ -240,13 +240,14 @@ public class VisualizationTreeOfShape extends JPanel {
 	public void addTable(ResultsTable rt, NodeToS v){
 		rt.incrementCounter();
 		rt.addValue("PIXEL_CANONICAL", v.getCanonicalPixel());
-		rt.addValue("LEVEL", v.getAttributeValue(Attribute.LEVEL));
 		rt.addValue("AREA", v.getAttributeValue(Attribute.AREA));
 		rt.addValue("VOLUME", v.getAttributeValue(Attribute.VOLUME));
 		rt.addValue("ALTITUDE", v.getAttributeValue(Attribute.ALTITUDE));
 		rt.addValue("HEIGHT", v.getAttributeValue(Attribute.HEIGHT));
 		rt.addValue("WIDTH", v.getAttributeValue(Attribute.WIDTH));
+		rt.addValue("LEVEL", v.getAttributeValue(Attribute.LEVEL));
 		rt.addValue("VARIANCE_LEVEL", v.getAttributeValue(Attribute.VARIANCE_LEVEL));
+		rt.addValue("LEVEL_MEAN", v.getAttributeValue(Attribute.LEVEL_MEAN));
 		rt.addValue("NUM_HOLES", v.getAttributeValue(Attribute.NUM_HOLES));
 		rt.addValue("PERIMETER", v.getAttributeValue(Attribute.PERIMETER));
 		rt.addValue("PERIMETER_EXTERNAL", v.getAttributeValue(Attribute.PERIMETER_EXTERNAL));
