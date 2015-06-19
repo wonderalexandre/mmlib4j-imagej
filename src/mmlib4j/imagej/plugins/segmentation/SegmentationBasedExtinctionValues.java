@@ -29,7 +29,7 @@ import javax.swing.event.ChangeListener;
 
 import mmlib4j.images.ColorImage;
 import mmlib4j.images.GrayScaleImage;
-import mmlib4j.representation.tree.IMorphologicalTreeFiltering;
+import mmlib4j.representation.tree.MorphologicalTreeFiltering;
 import mmlib4j.representation.tree.attribute.Attribute;
 import mmlib4j.representation.tree.attribute.ComputerExtinctionValueComponentTree;
 import mmlib4j.representation.tree.attribute.ComputerExtinctionValueTreeOfShapes;
@@ -59,7 +59,7 @@ public class SegmentationBasedExtinctionValues  extends JFrame implements Action
 		private JPanel controlPanel= new JPanel();
 		private JPanel appPanelEV; 
 		
-		private IMorphologicalTreeFiltering tree;
+		private MorphologicalTreeFiltering tree;
 		private ComputerExtinctionValue extinctionValue;
 		private AdjacencyRelation adj4 = AdjacencyRelation.getCircular(1);
 		private AdjacencyRelation adj8 = AdjacencyRelation.getCircular(1.5);

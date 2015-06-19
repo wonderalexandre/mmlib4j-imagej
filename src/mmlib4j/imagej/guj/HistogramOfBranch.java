@@ -5,7 +5,7 @@ import ij.util.Tools;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import mmlib4j.representation.tree.IMorphologicalTreeFiltering;
+import mmlib4j.representation.tree.MorphologicalTreeFiltering;
 import mmlib4j.representation.tree.InfoPrunedTree;
 import mmlib4j.representation.tree.attribute.Attribute;
 import mmlib4j.representation.tree.attribute.ComputerExtinctionValueComponentTree;
@@ -134,11 +134,11 @@ public class HistogramOfBranch {
 		ArrayList<Float> listPxSelected = null;
 		ArrayList<Float> listPySelected = null;
 		
-		IMorphologicalTreeFiltering treeIn = prunedTree.getTree();
+		MorphologicalTreeFiltering treeIn = prunedTree.getTree();
 		if(treeIn instanceof ComponentTree){	
 			ComponentTree tree = (ComponentTree) treeIn;
 			
-			if (typePruning == IMorphologicalTreeFiltering.EXTINCTION_VALUE){
+			if (typePruning == MorphologicalTreeFiltering.EXTINCTION_VALUE){
 				ComputerExtinctionValueComponentTree ev = new ComputerExtinctionValueComponentTree(tree);
 				boolean selected[] = ev.getExtinctionValueNodeCT(indexAttr, prunedTree);
 				boolean selected2[] = new boolean[tree.getNumNode()];
@@ -169,7 +169,7 @@ public class HistogramOfBranch {
 					listPySelected.add(getAttribute(n));
 				}
 				//VisualizationComponentTree.getInstance(prunedTree, selected, selected2).setVisible(true);
-			}else if(typePruning == IMorphologicalTreeFiltering.PRUNING_MSER){
+			}else if(typePruning == MorphologicalTreeFiltering.PRUNING_MSER){
 				ComputerMserComponentTree mser = new ComputerMserComponentTree(tree);
 				boolean selected[] = mser.getMappingNodesByMSER(delta, prunedTree); 
 				boolean selected2[] = new boolean[tree.getNumNode()];
@@ -204,7 +204,7 @@ public class HistogramOfBranch {
 				}
 				//VisualizationComponentTree.getInstance(prunedTree, selected, selected2).setVisible(true);
 			}
-			else if(typePruning == IMorphologicalTreeFiltering.PRUNING_GRADUAL_TRANSITION){
+			else if(typePruning == MorphologicalTreeFiltering.PRUNING_GRADUAL_TRANSITION){
 				PruningBasedGradualTransition gt = new PruningBasedGradualTransition(treeIn, prunedTree.getAttributeType(), delta);
 				boolean selected[] = gt.getMappingSelectedNodes(prunedTree); 
 				boolean selected2[] = new boolean[tree.getNumNode()];
@@ -255,7 +255,7 @@ public class HistogramOfBranch {
 		}else{
 			TreeOfShape tree = (TreeOfShape) treeIn;
 			
-			if (typePruning == IMorphologicalTreeFiltering.EXTINCTION_VALUE){
+			if (typePruning == MorphologicalTreeFiltering.EXTINCTION_VALUE){
 				ComputerExtinctionValueTreeOfShapes ev = new ComputerExtinctionValueTreeOfShapes(tree);
 				boolean selected[] = ev.getExtinctionValueNode(indexAttr, prunedTree);
 				boolean selected2[] = new boolean[tree.getNumNode()];
@@ -288,7 +288,7 @@ public class HistogramOfBranch {
 				
 				
 			}
-			else if(typePruning == IMorphologicalTreeFiltering.PRUNING_MSER){
+			else if(typePruning == MorphologicalTreeFiltering.PRUNING_MSER){
 				ComputerMserTreeOfShapes mser = new ComputerMserTreeOfShapes(tree);
 				boolean selected[] = mser.getMappingNodesByMSER(delta, prunedTree); 
 				boolean selected2[] = new boolean[tree.getNumNode()];
@@ -374,7 +374,7 @@ public class HistogramOfBranch {
 	}
 	
 
-	public void run(IMorphologicalTreeFiltering treeIn, int typePruning, int delta) {
+	public void run(MorphologicalTreeFiltering treeIn, int typePruning, int delta) {
 		ArrayList<Float> listPx = new ArrayList<Float>();
 		ArrayList<Float> listPy = new ArrayList<Float>();
 
@@ -385,7 +385,7 @@ public class HistogramOfBranch {
 		if(treeIn instanceof ComponentTree){	
 			ComponentTree tree = (ComponentTree) treeIn;
 			
-			if (typePruning == IMorphologicalTreeFiltering.EXTINCTION_VALUE){
+			if (typePruning == MorphologicalTreeFiltering.EXTINCTION_VALUE){
 				ComputerExtinctionValueComponentTree ev = new ComputerExtinctionValueComponentTree(tree);
 				boolean selected[] = ev.getExtinctionValueNodeCT(indexAttr);
 				boolean selected2[] = new boolean[tree.getNumNode()];
@@ -416,7 +416,7 @@ public class HistogramOfBranch {
 					listPySelected.add(getAttribute(n));
 				}
 				//VisualizationComponentTree.getInstance(prunedTree, selected, selected2).setVisible(true);
-			}else if(typePruning == IMorphologicalTreeFiltering.PRUNING_MSER){
+			}else if(typePruning == MorphologicalTreeFiltering.PRUNING_MSER){
 				ComputerMserComponentTree mser = new ComputerMserComponentTree(tree);
 				boolean selected[] = mser.getMappingNodesByMSER(delta); 
 				boolean selected2[] = new boolean[tree.getNumNode()];
@@ -451,7 +451,7 @@ public class HistogramOfBranch {
 				}
 				//VisualizationComponentTree.getInstance(prunedTree, selected, selected2).setVisible(true);
 			}
-			else if(typePruning == IMorphologicalTreeFiltering.PRUNING_GRADUAL_TRANSITION){
+			else if(typePruning == MorphologicalTreeFiltering.PRUNING_GRADUAL_TRANSITION){
 				PruningBasedGradualTransition gt = new PruningBasedGradualTransition(treeIn, indexAttr, delta);
 				boolean selected[] = gt.getMappingSelectedNodes(); 
 				boolean selected2[] = new boolean[tree.getNumNode()];
@@ -503,7 +503,7 @@ public class HistogramOfBranch {
 		}else{
 			TreeOfShape tree = (TreeOfShape) treeIn;
 			
-			if (typePruning == IMorphologicalTreeFiltering.EXTINCTION_VALUE){
+			if (typePruning == MorphologicalTreeFiltering.EXTINCTION_VALUE){
 				ComputerExtinctionValueTreeOfShapes ev = new ComputerExtinctionValueTreeOfShapes(tree);
 				boolean selected[] = ev.getExtinctionValueNode(indexAttr, delta);
 				boolean selected2[] = new boolean[tree.getNumNode()];
@@ -537,7 +537,7 @@ public class HistogramOfBranch {
 				
 				
 			}
-			else if(typePruning == IMorphologicalTreeFiltering.PRUNING_MSER){
+			else if(typePruning == MorphologicalTreeFiltering.PRUNING_MSER){
 				ComputerMserTreeOfShapes mser = new ComputerMserTreeOfShapes(tree);
 				boolean selected[] = mser.getMappingNodesByMSER(delta); 
 				boolean selected2[] = new boolean[tree.getNumNode()];
@@ -622,7 +622,7 @@ public class HistogramOfBranch {
 	}
 	
 
-	public void runPrimitivesFamily(IMorphologicalTreeFiltering treeIn, int typePruning, int delta) {
+	public void runPrimitivesFamily(MorphologicalTreeFiltering treeIn, int typePruning, int delta) {
 		ArrayList<Float> listPx = new ArrayList<Float>();
 		ArrayList<Float> listPy = new ArrayList<Float>();
 
@@ -633,7 +633,7 @@ public class HistogramOfBranch {
 		if(treeIn instanceof ComponentTree){	
 			ComponentTree tree = (ComponentTree) treeIn;
 			
-			if (typePruning == IMorphologicalTreeFiltering.EXTINCTION_VALUE){
+			if (typePruning == MorphologicalTreeFiltering.EXTINCTION_VALUE){
 				ComputerExtinctionValueComponentTree ev = new ComputerExtinctionValueComponentTree(tree);
 				boolean selected[] = ev.getExtinctionValueNodeCT(indexAttr);
 				boolean selected2[] = new boolean[tree.getNumNode()];
@@ -669,7 +669,7 @@ public class HistogramOfBranch {
 					listPySelected.add(contNodes[n.getId()]);
 				}
 				//VisualizationComponentTree.getInstance(prunedTree, selected, selected2).setVisible(true);
-			}else if(typePruning == IMorphologicalTreeFiltering.PRUNING_MSER){
+			}else if(typePruning == MorphologicalTreeFiltering.PRUNING_MSER){
 				ComputerMserComponentTree mser = new ComputerMserComponentTree(tree);
 				boolean selected[] = mser.getMappingNodesByMSER(delta); 
 				boolean selected2[] = new boolean[tree.getNumNode()];
@@ -709,7 +709,7 @@ public class HistogramOfBranch {
 				}
 				//VisualizationComponentTree.getInstance(prunedTree, selected, selected2).setVisible(true);
 			}
-			else if(typePruning == IMorphologicalTreeFiltering.PRUNING_GRADUAL_TRANSITION){
+			else if(typePruning == MorphologicalTreeFiltering.PRUNING_GRADUAL_TRANSITION){
 				PruningBasedGradualTransition gt = new PruningBasedGradualTransition(treeIn, indexAttr, delta);
 				boolean selected[] = gt.getMappingSelectedNodes(); 
 				boolean selected2[] = new boolean[tree.getNumNode()];
@@ -772,7 +772,7 @@ public class HistogramOfBranch {
 		}else{
 			TreeOfShape tree = (TreeOfShape) treeIn;
 			
-			if (typePruning == IMorphologicalTreeFiltering.EXTINCTION_VALUE){
+			if (typePruning == MorphologicalTreeFiltering.EXTINCTION_VALUE){
 				ComputerExtinctionValueTreeOfShapes ev = new ComputerExtinctionValueTreeOfShapes(tree);
 				boolean selected[] = ev.getExtinctionValueNode(indexAttr, delta);
 				boolean selected2[] = new boolean[tree.getNumNode()];
@@ -812,7 +812,7 @@ public class HistogramOfBranch {
 				
 				
 			}
-			else if(typePruning == IMorphologicalTreeFiltering.PRUNING_MSER){
+			else if(typePruning == MorphologicalTreeFiltering.PRUNING_MSER){
 				ComputerMserTreeOfShapes mser = new ComputerMserTreeOfShapes(tree);
 				boolean selected[] = mser.getMappingNodesByMSER(delta); 
 				boolean selected2[] = new boolean[tree.getNumNode()];
@@ -908,7 +908,7 @@ public class HistogramOfBranch {
 		pw.show();
 	}
 	
-	public void run_OLD(IMorphologicalTreeFiltering treeIn, int typePruning, int delta) {
+	public void run_OLD(MorphologicalTreeFiltering treeIn, int typePruning, int delta) {
 		ArrayList<Float> listPx = new ArrayList<Float>();
 		ArrayList<Float> listPy = new ArrayList<Float>();
 

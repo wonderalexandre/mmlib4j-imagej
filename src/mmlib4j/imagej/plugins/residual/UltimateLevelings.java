@@ -45,7 +45,7 @@ import mmlib4j.imagej.guj.VisualizationComponentTree;
 import mmlib4j.imagej.guj.VisualizationTreeOfShape;
 import mmlib4j.imagej.utils.ImageJAdapter;
 import mmlib4j.images.GrayScaleImage;
-import mmlib4j.representation.tree.IMorphologicalTreeFiltering;
+import mmlib4j.representation.tree.MorphologicalTreeFiltering;
 import mmlib4j.representation.tree.attribute.Attribute;
 import mmlib4j.representation.tree.componentTree.ComponentTree;
 import mmlib4j.representation.tree.componentTree.ConnectedFilteringByComponentTree;
@@ -78,9 +78,9 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 	private GrayScaleImage imgInputOriginal;
 	private GrayScaleImage imgCurrent;
 	
-	private IMorphologicalTreeFiltering tree;
-	private IMorphologicalTreeFiltering maxTree;
-	private IMorphologicalTreeFiltering minTree;
+	private MorphologicalTreeFiltering tree;
+	private MorphologicalTreeFiltering maxTree;
+	private MorphologicalTreeFiltering minTree;
 	
 	private AdjacencyRelation adj8 = AdjacencyRelation.getCircular(1.5);
 	private boolean flagLabel = false;
@@ -234,16 +234,16 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 				attr = 3;
 			
 			String pruningSelected = (String) this.comboPruningStrategy.getSelectedItem();
-			int typePruning = IMorphologicalTreeFiltering.PRUNING;
+			int typePruning = MorphologicalTreeFiltering.PRUNING;
 			if(pruningSelected.equals("Gradual transition")){
-				typePruning = IMorphologicalTreeFiltering.PRUNING_GRADUAL_TRANSITION;
+				typePruning = MorphologicalTreeFiltering.PRUNING_GRADUAL_TRANSITION;
 			}
 			else if(pruningSelected.equals("MSER")){
-				typePruning = IMorphologicalTreeFiltering.PRUNING_MSER;
+				typePruning = MorphologicalTreeFiltering.PRUNING_MSER;
 			}
 			
 			else if(pruningSelected.equals("Extinction value")){
-				typePruning = IMorphologicalTreeFiltering.EXTINCTION_VALUE;
+				typePruning = MorphologicalTreeFiltering.EXTINCTION_VALUE;
 			}
 			
 			if(comboResiduo.getSelectedItem().equals("Max{ ultimate Attribute opening and closing }")){
@@ -602,13 +602,13 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 			if(pruningSelected.equals("MSER")){
 				System.out.println("TreeOfShape - MSER");
 				int delta = paramDeltaOfFilter.getValue();
-				return new PruningBasedMSER((IMorphologicalTreeFiltering) tree, delta).getMappingSelectedNodes(); 
+				return new PruningBasedMSER((MorphologicalTreeFiltering) tree, delta).getMappingSelectedNodes(); 
 				//return new MSER(tree).getMappingNodesByMSER(delta);
 			}
 			if(pruningSelected.equals("MSER by rank")){
 				System.out.println("TreeOfShape - MSER by rank");
 				int delta = paramDeltaOfFilter.getValue();
-				return new PruningBasedMSER((IMorphologicalTreeFiltering) tree, delta).getMappingSelectedNodesRank();
+				return new PruningBasedMSER((MorphologicalTreeFiltering) tree, delta).getMappingSelectedNodesRank();
 			}
 			else if(pruningSelected.equals("---- Text location ----")){
 				System.out.println("TreeOfShape - MSER with Text location");
@@ -904,9 +904,9 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 		//int attributeValueMin = 0;
 		
 		//attributeValueMin = attributeValueMinResiduo.getValue();
-		IMorphologicalTreeFiltering tree = null;
-		IMorphologicalTreeFiltering maxTree= null;
-		IMorphologicalTreeFiltering minTree= null;
+		MorphologicalTreeFiltering tree = null;
+		MorphologicalTreeFiltering maxTree= null;
+		MorphologicalTreeFiltering minTree= null;
 		if(img == imgInput){
 			tree = this.tree;
 			maxTree = this.maxTree;
