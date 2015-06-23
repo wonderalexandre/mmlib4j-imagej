@@ -71,7 +71,7 @@ import mmlib4j.utils.ImageAlgebra;
  * @author Wonder Alexandre Luz Alves
  *
  * Graphic User Interface by ImageJ
- */
+ */ 
 public class UltimateLevelings  extends PlugInFrame implements ActionListener, ChangeListener,  WindowListener, MouseListener {
 	
 	private static final long serialVersionUID = 1L;
