@@ -6,6 +6,7 @@ import ij.ImagePlus;
 import ij.WindowManager;
 import ij.gui.GUI;
 import ij.gui.GenericDialog;
+import ij.gui.MessageDialog;
 import ij.plugin.frame.PlugInFrame;
 import ij.process.ByteProcessor;
 
@@ -54,9 +55,9 @@ import mmlib4j.representation.tree.pruningStrategy.PruningBasedAttribute;
 import mmlib4j.representation.tree.pruningStrategy.PruningBasedExtinctionValue;
 import mmlib4j.representation.tree.pruningStrategy.PruningBasedGradualTransition;
 import mmlib4j.representation.tree.pruningStrategy.PruningBasedMSER;
-import mmlib4j.representation.tree.pruningStrategy.PruningBasedMSERWithCircularity;
-import mmlib4j.representation.tree.pruningStrategy.PruningBasedMSERWithElongation;
-import mmlib4j.representation.tree.pruningStrategy.PruningBasedMSERWithTextLocation;
+import mmlib4j.representation.tree.pruningStrategy.PruningBasedCircularity;
+import mmlib4j.representation.tree.pruningStrategy.PruningBasedElongation;
+import mmlib4j.representation.tree.pruningStrategy.PruningBasedTextLocation;
 import mmlib4j.representation.tree.pruningStrategy.PruningBasedTBMR;
 import mmlib4j.representation.tree.tos.ConnectedFilteringByTreeOfShape;
 import mmlib4j.representation.tree.tos.TreeOfShape;
@@ -91,12 +92,77 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 	private String titleImg;
 	
 	private class ParamElongation{
-		double elong;
-		int areaMin;
+		double elong=0.7;
+		int areaMin=50;
 		int areaMax;
-		ParamElongation(double e, int min, int max){elong = e; areaMin=min; areaMax=max;}
+		String selectedNode = "--- no filtering ---";
+		ParamElongation(){
+			areaMax=imgInput.getSize();
+		}
 	}
 	private ParamElongation paramElongation;
+	
+	private class ParamCircularity{
+		double circ=0.4;
+		int areaMin=10;
+		int areaMax;
+		String selectedNode = "--- no filtering ---";
+		ParamCircularity(){
+			areaMax=imgInput.getSize();
+		}
+	}
+	private ParamCircularity paramCircularity;
+	
+	private class ParamTextLocation{
+		int areaMin=100;
+		int areaMax=100000;
+		int heightMin = 20;
+		int heightMax = 400;
+		int widthMin = 10;
+		int widthMax = 400;
+		int numHoleMin = 0;
+		int numHoleMax = 20;
+		double rectMin = 0.3;
+		double rectMax = 0.95;
+		double ratioWHMin=0;
+		double ratioWHMax=8;
+		
+		double varianceMin=0;
+		double varianceMax=100;
+		double eccentMin=0.1;
+		double eccentMax=3;
+		double compactMin=0.0025;
+		double compactMax=0.05;
+		
+		String selectedNode = "--- no filtering ---";
+		ParamTextLocation(){
+			areaMax=imgInput.getSize();
+			heightMax=imgInput.getHeight();
+			widthMax =imgInput.getWidth();
+		}
+	}
+	private ParamTextLocation paramTextLocation;
+	
+	private class ParamMSER{
+		double maxVariation = 3;
+		int minArea=0;
+		int maxArea=Integer.MAX_VALUE;
+		int attribute = Attribute.AREA;
+		ParamMSER(){
+			maxArea = imgInput.getSize();
+		}
+	}
+	ParamMSER paramMSER;
+	
+	private class ParamTBMR{
+		double maxVariation = 3;
+		int minArea=5;
+		int maxArea;
+		ParamTBMR(){
+			maxArea = imgInput.getSize();
+		}
+	}
+	ParamTBMR paramTBMR;
 	
 	public UltimateLevelings(ImagePlus plus) {
 		super("Ultimate Levelings - " + plus.getTitle());
@@ -121,7 +187,11 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 		this.imgInput = ImageJAdapter.toGrayScaleImage( (ByteProcessor) plus.getProcessor());
 		this.setMenuBar( IJ.getInstance().getMenuBar() );
 		
-		paramElongation = new ParamElongation(0.7, 50, imgInput.getSize());
+		paramElongation = new ParamElongation( );
+		paramCircularity = new ParamCircularity( );
+		paramTextLocation = new ParamTextLocation( );
+		paramMSER = new ParamMSER( );
+		paramTBMR = new ParamTBMR();
 		
 		imgInputOriginal = imgInput.duplicate();
 		
@@ -561,29 +631,44 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 			if(pruningSelected.equals("MSER")){
 				System.out.println("ComponentTree - MSER");
 				int delta = paramDeltaOfFilter.getValue();
-				
-				return new PruningBasedMSER(tree, delta).getMappingSelectedNodes(); //new MserCT(tree).getMappingNodesByMSER(delta);
+				pruning = new PruningBasedMSER(tree, delta);
+				((PruningBasedMSER) pruning).setParameters(paramMSER.minArea, paramMSER.maxArea, paramMSER.maxVariation, paramMSER.attribute);				
+				return pruning.getMappingSelectedNodes(); //new MserCT(tree).getMappingNodesByMSER(delta);
 			}
 			if(pruningSelected.equals("MSER by rank")){
 				System.out.println("ComponentTree - MSER by rank");
 				int delta = paramDeltaOfFilter.getValue();
-				return new PruningBasedMSER(tree, delta).getMappingSelectedNodesRank();
+				pruning = new PruningBasedMSER(tree, delta);
+				((PruningBasedMSER) pruning).setParameters(paramMSER.minArea, paramMSER.maxArea, paramMSER.maxVariation, paramMSER.attribute);
+				return ((PruningBasedMSER) pruning).getMappingSelectedNodesRank();
 			}
 			else if(pruningSelected.equals("---- Text location ----")){
-				System.out.println("ComponentTree - MSER with Text location");
+				System.out.println("ComponentTree - Text location");
 				int delta = paramDeltaOfFilter.getValue();
-				return new PruningBasedMSERWithTextLocation(this.tree, delta).getMappingSelectedNodes();
+				pruning = new PruningBasedTextLocation(this.tree);
+				((PruningBasedTextLocation)pruning).setParametersMSER(delta, paramMSER.maxVariation, paramMSER.attribute);
+				((PruningBasedTextLocation)pruning).setParametersTBMR(paramTBMR.minArea, paramTBMR.maxArea);
+				((PruningBasedTextLocation)pruning).setParameters(paramTextLocation.areaMin, paramTextLocation.areaMax, paramTextLocation.heightMin, paramTextLocation.heightMax, paramTextLocation.widthMin, paramTextLocation.widthMax,
+						paramTextLocation.numHoleMin, paramTextLocation.numHoleMax, paramTextLocation.rectMin, paramTextLocation.rectMax, paramTextLocation.ratioWHMin, paramTextLocation.ratioWHMax, paramTextLocation.varianceMin, paramTextLocation.varianceMax,
+						paramTextLocation.eccentMin, paramTextLocation.eccentMax, paramTextLocation.compactMin, paramTextLocation.compactMax, paramTextLocation.selectedNode);
+				return pruning.getMappingSelectedNodes();
 			}
 			else if(pruningSelected.equals("---- Circularity ----")){
-				System.out.println("ComponentTree - MSER with circularity");
+				System.out.println("ComponentTree - Circularity");
 				int delta = paramDeltaOfFilter.getValue();
-				return new PruningBasedMSERWithCircularity(this.tree, delta).getMappingSelectedNodes();
+				pruning = new PruningBasedCircularity(this.tree);
+				((PruningBasedCircularity)pruning).setParametersMSER(delta, paramMSER.maxVariation, paramMSER.attribute);
+				((PruningBasedCircularity)pruning).setParametersTBMR(paramTBMR.minArea, paramTBMR.maxArea);
+				((PruningBasedCircularity)pruning).setParameters(paramCircularity.areaMin, paramCircularity.areaMax, paramCircularity.circ, paramCircularity.selectedNode);
+				return pruning.getMappingSelectedNodes();
 			}
 			else if(pruningSelected.equals("---- Elongation ----")){
-				System.out.println("ComponentTree - MSER with elongation");
+				System.out.println("ComponentTree - Elongation");
 				int delta = paramDeltaOfFilter.getValue();
-				pruning = new PruningBasedMSERWithElongation(this.tree, delta);
-				((PruningBasedMSERWithElongation)pruning).setParametersElongationFunction(paramElongation.areaMin, paramElongation.areaMax, paramElongation.elong);
+				pruning = new PruningBasedElongation(this.tree);
+				((PruningBasedElongation)pruning).setParametersMSER(delta, paramMSER.maxVariation, paramMSER.attribute);
+				((PruningBasedElongation)pruning).setParametersTBMR(paramTBMR.minArea, paramTBMR.maxArea);
+				((PruningBasedElongation)pruning).setParameters(paramElongation.areaMin, paramElongation.areaMax, paramElongation.elong, paramElongation.selectedNode);
 				return pruning.getMappingSelectedNodes();
 			}
 			
@@ -602,28 +687,45 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 			if(pruningSelected.equals("MSER")){
 				System.out.println("TreeOfShape - MSER");
 				int delta = paramDeltaOfFilter.getValue();
-				return new PruningBasedMSER((MorphologicalTreeFiltering) tree, delta).getMappingSelectedNodes(); 
-				//return new MSER(tree).getMappingNodesByMSER(delta);
+				pruning = new PruningBasedMSER((MorphologicalTreeFiltering)tree, delta);
+				((PruningBasedMSER) pruning).setParameters(paramMSER.minArea, paramMSER.maxArea, paramMSER.maxVariation, paramMSER.attribute);
+				return pruning.getMappingSelectedNodes(); 
 			}
 			if(pruningSelected.equals("MSER by rank")){
 				System.out.println("TreeOfShape - MSER by rank");
 				int delta = paramDeltaOfFilter.getValue();
-				return new PruningBasedMSER((MorphologicalTreeFiltering) tree, delta).getMappingSelectedNodesRank();
+				pruning = new PruningBasedMSER((MorphologicalTreeFiltering)tree, delta);
+				((PruningBasedMSER) pruning).setParameters(paramMSER.minArea, paramMSER.maxArea, paramMSER.maxVariation, paramMSER.attribute);
+				return ((PruningBasedMSER) pruning).getMappingSelectedNodesRank();
 			}
 			else if(pruningSelected.equals("---- Text location ----")){
-				System.out.println("TreeOfShape - MSER with Text location");
+				System.out.println("TreeOfShape - Text location");
 				int delta = paramDeltaOfFilter.getValue();
-				return new PruningBasedMSERWithTextLocation(this.tree, delta).getMappingSelectedNodes();
+				pruning = new PruningBasedTextLocation(this.tree);
+				((PruningBasedTextLocation)pruning).setParametersMSER(delta, paramMSER.maxVariation, paramMSER.attribute);
+				((PruningBasedTextLocation)pruning).setParametersTBMR(paramTBMR.minArea, paramTBMR.maxArea);
+				((PruningBasedTextLocation)pruning).setParameters(paramTextLocation.areaMin, paramTextLocation.areaMax, paramTextLocation.heightMin, paramTextLocation.heightMax, paramTextLocation.widthMin, paramTextLocation.widthMax,
+						paramTextLocation.numHoleMin, paramTextLocation.numHoleMax, paramTextLocation.rectMin, paramTextLocation.rectMax, paramTextLocation.ratioWHMin, paramTextLocation.ratioWHMax, paramTextLocation.varianceMin, paramTextLocation.varianceMax,
+						paramTextLocation.eccentMin, paramTextLocation.eccentMax, paramTextLocation.compactMin, paramTextLocation.compactMax, paramTextLocation.selectedNode);
+				return pruning.getMappingSelectedNodes();
 			}
 			else if(pruningSelected.equals("---- Circularity ----")){
-				System.out.println("TreeOfShape - MSER with circularity");
+				System.out.println("TreeOfShape - Circularity");
 				int delta = paramDeltaOfFilter.getValue();
-				return new PruningBasedMSERWithCircularity(this.tree, delta).getMappingSelectedNodes();
+				pruning = new PruningBasedCircularity(this.tree);
+				((PruningBasedCircularity)pruning).setParametersMSER(delta, paramMSER.maxVariation, paramMSER.attribute);
+				((PruningBasedCircularity)pruning).setParametersTBMR(paramTBMR.minArea, paramTBMR.maxArea);
+				((PruningBasedCircularity)pruning).setParameters(paramCircularity.areaMin, paramCircularity.areaMax, paramCircularity.circ, paramCircularity.selectedNode);
+				return pruning.getMappingSelectedNodes();
 			}
-			else if(pruningSelected.equals("---- Circularity ----")){
-				System.out.println("TreeOfShape - MSER with circularity");
+			else if(pruningSelected.equals("---- Elongation ----")){
+				System.out.println("TreeOfShape - Elongation");
 				int delta = paramDeltaOfFilter.getValue();
-				return new PruningBasedMSERWithElongation(this.tree, delta).getMappingSelectedNodes();
+				pruning = new PruningBasedElongation(this.tree);
+				((PruningBasedElongation)pruning).setParametersMSER(delta, paramMSER.maxVariation, paramMSER.attribute);
+				((PruningBasedElongation)pruning).setParametersTBMR(paramTBMR.minArea, paramTBMR.maxArea);
+				((PruningBasedElongation)pruning).setParameters(paramElongation.areaMin, paramElongation.areaMax, paramElongation.elong, paramElongation.selectedNode);
+				return pruning.getMappingSelectedNodes();
 			}
 			else if(pruningSelected.equals("TBMR")){
 				System.out.println("TreeOfShape - TBMR");
@@ -648,18 +750,109 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 			flagLabel = false;
 		}
 		else if(e.getSource() == applyButtonGrad){
-			if(pruning != null && pruning instanceof PruningBasedMSERWithElongation){
+			if(pruning != null && pruning instanceof PruningBasedMSER){
 				GenericDialog gd = new GenericDialog("Parameters", this);
-				gd.addNumericField("Elongation (0 to 1)", paramElongation.elong, 3);
+				gd.addNumericField("Variation (max)", paramMSER.maxVariation, 2);
+				gd.addNumericField("Area (min)", paramMSER.maxArea, 0);
+				gd.addNumericField("Area (max)", paramMSER.minArea, 0);
+				gd.addChoice("Attribute (type)", new String[]{"Area", "Volume", "Height", "Width", "Altitude"}, "Area");
+				gd.showDialog();
+				if (!gd.wasCanceled()){
+					paramMSER.maxVariation = gd.getNextNumber();
+					paramMSER.minArea = (int) gd.getNextNumber();
+					paramMSER.maxArea = (int) gd.getNextNumber();
+					paramMSER.attribute = gd.getNextChoiceIndex();
+					updateExtractionResidues();
+				}
+			}
+			else if(pruning != null && pruning instanceof PruningBasedTBMR){
+				GenericDialog gd = new GenericDialog("Parameters", this);
+				gd.addNumericField("Area (min)", paramTBMR.maxArea, 0);
+				gd.addNumericField("Area (max)", paramTBMR.minArea, 0);
+				gd.showDialog();
+				if (!gd.wasCanceled()){
+					paramTBMR.minArea = (int) gd.getNextNumber();
+					paramTBMR.maxArea = (int) gd.getNextNumber();
+					updateExtractionResidues();
+				}
+			}
+			else if(pruning != null && pruning instanceof PruningBasedElongation){
+				GenericDialog gd = new GenericDialog("Parameters", this);
+				gd.addNumericField("Elongation (0 to 1)", paramElongation.elong, 2);
 				gd.addNumericField("Area (min)", paramElongation.areaMin, 0);
 				gd.addNumericField("Area (max)", paramElongation.areaMax, 0);
+				gd.addChoice("Selected (nodes)", new String[]{"--- no filtering ---", "MSER", "MSER by rank", "TBMR"}, paramElongation.selectedNode);
 				gd.showDialog();
 				if (!gd.wasCanceled()){
 					paramElongation.elong = gd.getNextNumber();
 					paramElongation.areaMin = (int) gd.getNextNumber();
 					paramElongation.areaMax = (int) gd.getNextNumber();
+					paramElongation.selectedNode = gd.getNextChoice();
 					updateExtractionResidues();
 				}
+			}
+			else if(pruning != null && pruning instanceof PruningBasedCircularity){
+				GenericDialog gd = new GenericDialog("Parameters", this);
+				gd.addNumericField("Circularity (0 to 1)", paramCircularity.circ, 2);
+				gd.addNumericField("Area (min)", paramCircularity.areaMin, 0);
+				gd.addNumericField("Area (max)", paramCircularity.areaMax, 0);
+				gd.addChoice("Selected (nodes)", new String[]{"--- no filtering ---", "MSER", "MSER by rank", "TBMR"}, paramElongation.selectedNode);
+				gd.showDialog();
+				if (!gd.wasCanceled()){
+					paramCircularity.circ = gd.getNextNumber();
+					paramCircularity.areaMin = (int) gd.getNextNumber();
+					paramCircularity.areaMax = (int) gd.getNextNumber();
+					paramElongation.selectedNode = gd.getNextChoice();
+					updateExtractionResidues();
+				}
+			}
+			else if(pruning != null && pruning instanceof PruningBasedTextLocation){
+				GenericDialog gd = new GenericDialog("Parameters", this);
+				gd.addNumericField("Area (min)", paramTextLocation.areaMin, 0);
+				gd.addNumericField("Area (max)", paramTextLocation.areaMax, 0);
+				gd.addNumericField("Height (min)", paramTextLocation.heightMin, 0);
+				gd.addNumericField("Height (max)", paramTextLocation.heightMax, 0);
+				gd.addNumericField("Width (min)", paramTextLocation.widthMin, 0);
+				gd.addNumericField("Width (max)", paramTextLocation.widthMax, 0);
+				gd.addNumericField("Number of holes (min)", paramTextLocation.numHoleMin, 0);
+				gd.addNumericField("Number of holes (max)", paramTextLocation.numHoleMax, 0);
+				gd.addNumericField("Rectangularity (min)", paramTextLocation.rectMin, 2);
+				gd.addNumericField("Rectangularity (max)", paramTextLocation.rectMax, 2);
+				gd.addNumericField("Ratio Width/Height (min)", paramTextLocation.ratioWHMin, 2);
+				gd.addNumericField("Ratio Width/Height (max)", paramTextLocation.ratioWHMax, 2);
+				gd.addNumericField("Variance (min)", paramTextLocation.varianceMin, 2);
+				gd.addNumericField("Variance (max)", paramTextLocation.varianceMax, 2);
+				gd.addNumericField("Eccentricity (min)", paramTextLocation.eccentMin, 2);
+				gd.addNumericField("Eccentricity (max)", paramTextLocation.eccentMax, 2);
+				gd.addNumericField("Compactness (min)", paramTextLocation.compactMin, 2);
+				gd.addNumericField("Compactness (max)", paramTextLocation.compactMax, 2);
+				gd.addChoice("Selected (nodes)", new String[]{"--- no filtering ---", "MSER", "MSER by rank", "TBMR"}, paramTextLocation.selectedNode);
+				
+				gd.showDialog();
+				if (!gd.wasCanceled()){
+					paramTextLocation.areaMin = (int) gd.getNextNumber();
+					paramTextLocation.areaMax = (int) gd.getNextNumber();
+					paramTextLocation.heightMin = (int) gd.getNextNumber();
+					paramTextLocation.heightMax = (int) gd.getNextNumber();
+					paramTextLocation.widthMin = (int) gd.getNextNumber();
+					paramTextLocation.widthMax = (int) gd.getNextNumber();
+					paramTextLocation.numHoleMin = (int) gd.getNextNumber();
+					paramTextLocation.numHoleMax = (int) gd.getNextNumber();
+					paramTextLocation.rectMin = gd.getNextNumber();
+					paramTextLocation.rectMax = gd.getNextNumber();
+					paramTextLocation.ratioWHMin = gd.getNextNumber();
+					paramTextLocation.ratioWHMax = gd.getNextNumber();
+					paramTextLocation.varianceMin = gd.getNextNumber();
+					paramTextLocation.varianceMax = gd.getNextNumber();
+					paramTextLocation.eccentMin = gd.getNextNumber();
+					paramTextLocation.eccentMax = gd.getNextNumber();
+					paramTextLocation.compactMin = gd.getNextNumber();
+					paramTextLocation.compactMax = gd.getNextNumber();
+					paramTextLocation.selectedNode = gd.getNextChoice();
+					updateExtractionResidues();
+				}
+			}else{
+				new MessageDialog(this, "Warning", "no parameter");
 			}
 		}
 		

@@ -8,6 +8,7 @@ import ij.ImageJ;
  *
  * Graphic User Interface by ImageJ
  */
+
 public class ImageJTest {
 
 	public static void main(String[] args) {
@@ -16,7 +17,7 @@ public class ImageJTest {
 		System.setProperty("user.dir", "./bin");
 		
 		ImageUtils.initMMorph4J();
-		
+		//-Xms2500m -Xmx2500m
 		ImageJ ij = new ImageJ(null, ImageJ.STANDALONE);
 		
 	}
