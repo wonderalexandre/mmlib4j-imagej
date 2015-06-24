@@ -145,7 +145,7 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 	
 	private class ParamMSER{
 		double maxVariation = 3;
-		int minArea=0;
+		int minArea=10;
 		int maxArea=Integer.MAX_VALUE;
 		int attribute = Attribute.AREA;
 		ParamMSER(){
@@ -753,8 +753,8 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 			if(pruning != null && pruning instanceof PruningBasedMSER){
 				GenericDialog gd = new GenericDialog("Parameters", this);
 				gd.addNumericField("Variation (max)", paramMSER.maxVariation, 2);
-				gd.addNumericField("Area (min)", paramMSER.maxArea, 0);
-				gd.addNumericField("Area (max)", paramMSER.minArea, 0);
+				gd.addNumericField("Area (min)", paramMSER.minArea, 0);
+				gd.addNumericField("Area (max)", paramMSER.maxArea, 0);
 				gd.addChoice("Attribute (type)", new String[]{"Area", "Volume", "Height", "Width", "Altitude"}, "Area");
 				gd.showDialog();
 				if (!gd.wasCanceled()){
@@ -767,8 +767,8 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 			}
 			else if(pruning != null && pruning instanceof PruningBasedTBMR){
 				GenericDialog gd = new GenericDialog("Parameters", this);
-				gd.addNumericField("Area (min)", paramTBMR.maxArea, 0);
-				gd.addNumericField("Area (max)", paramTBMR.minArea, 0);
+				gd.addNumericField("Area (min)", paramTBMR.minArea, 0);
+				gd.addNumericField("Area (max)", paramTBMR.maxArea, 0);
 				gd.showDialog();
 				if (!gd.wasCanceled()){
 					paramTBMR.minArea = (int) gd.getNextNumber();
@@ -822,10 +822,10 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 				gd.addNumericField("Ratio Width/Height (max)", paramTextLocation.ratioWHMax, 2);
 				gd.addNumericField("Variance (min)", paramTextLocation.varianceMin, 2);
 				gd.addNumericField("Variance (max)", paramTextLocation.varianceMax, 2);
-				gd.addNumericField("Eccentricity (min)", paramTextLocation.eccentMin, 2);
-				gd.addNumericField("Eccentricity (max)", paramTextLocation.eccentMax, 2);
-				gd.addNumericField("Compactness (min)", paramTextLocation.compactMin, 2);
-				gd.addNumericField("Compactness (max)", paramTextLocation.compactMax, 2);
+				//gd.addNumericField("Eccentricity (min)", paramTextLocation.eccentMin, 2);
+				//gd.addNumericField("Eccentricity (max)", paramTextLocation.eccentMax, 2);
+				//gd.addNumericField("Compactness (min)", paramTextLocation.compactMin, 2);
+				//gd.addNumericField("Compactness (max)", paramTextLocation.compactMax, 2);
 				gd.addChoice("Selected (nodes)", new String[]{"--- no filtering ---", "MSER", "MSER by rank", "TBMR"}, paramTextLocation.selectedNode);
 				
 				gd.showDialog();
@@ -844,10 +844,10 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 					paramTextLocation.ratioWHMax = gd.getNextNumber();
 					paramTextLocation.varianceMin = gd.getNextNumber();
 					paramTextLocation.varianceMax = gd.getNextNumber();
-					paramTextLocation.eccentMin = gd.getNextNumber();
-					paramTextLocation.eccentMax = gd.getNextNumber();
-					paramTextLocation.compactMin = gd.getNextNumber();
-					paramTextLocation.compactMax = gd.getNextNumber();
+					//paramTextLocation.eccentMin = gd.getNextNumber();
+					//paramTextLocation.eccentMax = gd.getNextNumber();
+					//paramTextLocation.compactMin = gd.getNextNumber();
+					//paramTextLocation.compactMax = gd.getNextNumber();
 					paramTextLocation.selectedNode = gd.getNextChoice();
 					updateExtractionResidues();
 				}
