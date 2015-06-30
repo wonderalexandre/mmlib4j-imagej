@@ -349,11 +349,11 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 				new EvolutionResidue(ulr.getNodeDistribuition(), tree1,  mousex, mousey);
 			}
 			else{
-				ComponentTree treeCT = ((ComponentTree) tree).getClone();
-				UltimateAttributeOpening r = new UltimateAttributeOpening( treeCT );
+				
+				UltimateAttributeOpening r = new UltimateAttributeOpening( (ComponentTree) tree );
 				r.enableComputerDistribution(true);
 				r.computeUAO( getAttributeValue(), getAttributeType(), getPruningSelected(), getFilteringResidues());
-				new EvolutionResidue(r.getNodeDistribuition(), treeCT,  mousex, mousey);
+				new EvolutionResidue(r.getNodeDistribuition(), new ConnectedFilteringByComponentTree(imgInput, adj8, tree.getRoot().isNodeMaxtree()),  mousex, mousey);
 				
 			}
 			analisysButton.setSelected(false);
@@ -1053,8 +1053,9 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 		else if(comboAttributoResiduo.getSelectedItem().equals("Width")){ //Height
 			return Attribute.WIDTH;
 		}
-		else
-			return -1;
+		else{
+			throw new RuntimeException("invalid attribute");
+		}
 		
 	}
 	public int getAttributeValue(){

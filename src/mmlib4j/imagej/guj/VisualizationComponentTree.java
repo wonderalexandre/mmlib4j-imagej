@@ -152,29 +152,29 @@ public class VisualizationComponentTree extends JPanel {
 	public void addTable(ResultsTable rt, NodeCT v){
 		rt.incrementCounter();
 		rt.addValue("PIXEL_CANONICAL", v.getCanonicalPixel());
-		rt.addValue("AREA", v.getAttributeValue(Attribute.AREA));
-		rt.addValue("VOLUME", v.getAttributeValue(Attribute.VOLUME));
-		rt.addValue("ALTITUDE", v.getAttributeValue(Attribute.ALTITUDE));
-		rt.addValue("HEIGHT", v.getAttributeValue(Attribute.HEIGHT));
-		rt.addValue("WIDTH", v.getAttributeValue(Attribute.WIDTH));
-		rt.addValue("LEVEL", v.getAttributeValue(Attribute.LEVEL));
-		rt.addValue("VARIANCE_LEVEL", v.getAttributeValue(Attribute.VARIANCE_LEVEL));
-		rt.addValue("LEVEL_MEAN", v.getAttributeValue(Attribute.LEVEL_MEAN));
-		rt.addValue("NUM_HOLES", v.getAttributeValue(Attribute.NUM_HOLES));
-		rt.addValue("PERIMETER", v.getAttributeValue(Attribute.PERIMETER));
-		rt.addValue("PERIMETER_EXTERNAL", v.getAttributeValue(Attribute.PERIMETER_EXTERNAL));
-		rt.addValue("CIRCULARITY", v.getAttributeValue(Attribute.CIRCULARITY));
-		rt.addValue("COMPACTNESS", v.getAttributeValue(Attribute.COMPACTNESS));
-		rt.addValue("ELONGATION", v.getAttributeValue(Attribute.ELONGATION));
-		rt.addValue("RECTANGULARITY", v.getAttributeValue(Attribute.RECTANGULARITY));
-		rt.addValue("RATIO_WIDTH_HEIGHT", v.getAttributeValue(Attribute.RATIO_WIDTH_HEIGHT));
-		rt.addValue("MOMENT_ASPECT_RATIO", v.getAttributeValue(Attribute.MOMENT_ASPECT_RATIO));
-		rt.addValue("MOMENT_COMPACTNESS", v.getAttributeValue(Attribute.MOMENT_COMPACTNESS));
-		rt.addValue("MOMENT_ECCENTRICITY", v.getAttributeValue(Attribute.MOMENT_ECCENTRICITY));
-		rt.addValue("MOMENT_ELONGATION", v.getAttributeValue(Attribute.MOMENT_ELONGATION));
-		rt.addValue("MOMENT_LENGTH_MAJOR_AXES", v.getAttributeValue(Attribute.MOMENT_LENGTH_MAJOR_AXES));
-		rt.addValue("MOMENT_LENGTH_MINOR_AXES", v.getAttributeValue(Attribute.MOMENT_LENGTH_MINOR_AXES));
-		rt.addValue("MOMENT_ORIENTATION", v.getAttributeValue(Attribute.MOMENT_ORIENTATION));
+		if(v.hasAttribute(Attribute.AREA)) rt.addValue("AREA", v.getAttributeValue(Attribute.AREA));
+		if(v.hasAttribute(Attribute.VOLUME)) rt.addValue("VOLUME", v.getAttributeValue(Attribute.VOLUME));
+		if(v.hasAttribute(Attribute.ALTITUDE)) rt.addValue("ALTITUDE", v.getAttributeValue(Attribute.ALTITUDE));
+		if(v.hasAttribute(Attribute.HEIGHT)) rt.addValue("HEIGHT", v.getAttributeValue(Attribute.HEIGHT));
+		if(v.hasAttribute(Attribute.WIDTH)) rt.addValue("WIDTH", v.getAttributeValue(Attribute.WIDTH));
+		if(v.hasAttribute(Attribute.LEVEL)) rt.addValue("LEVEL", v.getAttributeValue(Attribute.LEVEL));
+		if(v.hasAttribute(Attribute.VARIANCE_LEVEL)) rt.addValue("VARIANCE_LEVEL", v.getAttributeValue(Attribute.VARIANCE_LEVEL));
+		if(v.hasAttribute(Attribute.LEVEL_MEAN)) rt.addValue("LEVEL_MEAN", v.getAttributeValue(Attribute.LEVEL_MEAN));
+		if(v.hasAttribute(Attribute.NUM_HOLES)) rt.addValue("NUM_HOLES", v.getAttributeValue(Attribute.NUM_HOLES));
+		if(v.hasAttribute(Attribute.PERIMETER)) rt.addValue("PERIMETER", v.getAttributeValue(Attribute.PERIMETER));
+		if(v.hasAttribute(Attribute.PERIMETER_EXTERNAL)) rt.addValue("PERIMETER_EXTERNAL", v.getAttributeValue(Attribute.PERIMETER_EXTERNAL));
+		if(v.hasAttribute(Attribute.CIRCULARITY)) rt.addValue("CIRCULARITY", v.getAttributeValue(Attribute.CIRCULARITY));
+		if(v.hasAttribute(Attribute.COMPACTNESS)) rt.addValue("COMPACTNESS", v.getAttributeValue(Attribute.COMPACTNESS));
+		if(v.hasAttribute(Attribute.ELONGATION)) rt.addValue("ELONGATION", v.getAttributeValue(Attribute.ELONGATION));
+		if(v.hasAttribute(Attribute.RECTANGULARITY)) rt.addValue("RECTANGULARITY", v.getAttributeValue(Attribute.RECTANGULARITY));
+		if(v.hasAttribute(Attribute.RATIO_WIDTH_HEIGHT)) rt.addValue("RATIO_WIDTH_HEIGHT", v.getAttributeValue(Attribute.RATIO_WIDTH_HEIGHT));
+		if(v.hasAttribute(Attribute.MOMENT_ASPECT_RATIO)) rt.addValue("MOMENT_ASPECT_RATIO", v.getAttributeValue(Attribute.MOMENT_ASPECT_RATIO));
+		if(v.hasAttribute(Attribute.MOMENT_COMPACTNESS)) rt.addValue("MOMENT_COMPACTNESS", v.getAttributeValue(Attribute.MOMENT_COMPACTNESS));
+		if(v.hasAttribute(Attribute.MOMENT_ECCENTRICITY)) rt.addValue("MOMENT_ECCENTRICITY", v.getAttributeValue(Attribute.MOMENT_ECCENTRICITY));
+		if(v.hasAttribute(Attribute.MOMENT_ELONGATION)) rt.addValue("MOMENT_ELONGATION", v.getAttributeValue(Attribute.MOMENT_ELONGATION));
+		if(v.hasAttribute(Attribute.MOMENT_LENGTH_MAJOR_AXES)) rt.addValue("MOMENT_LENGTH_MAJOR_AXES", v.getAttributeValue(Attribute.MOMENT_LENGTH_MAJOR_AXES));
+		if(v.hasAttribute(Attribute.MOMENT_LENGTH_MINOR_AXES)) rt.addValue("MOMENT_LENGTH_MINOR_AXES", v.getAttributeValue(Attribute.MOMENT_LENGTH_MINOR_AXES));
+		if(v.hasAttribute(Attribute.MOMENT_ORIENTATION)) rt.addValue("MOMENT_ORIENTATION", v.getAttributeValue(Attribute.MOMENT_ORIENTATION));
 		
 	}
 	
