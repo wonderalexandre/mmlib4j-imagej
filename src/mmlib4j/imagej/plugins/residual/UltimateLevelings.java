@@ -428,6 +428,8 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 		comboInfoResiduo.addItem("Inf. residues (+/-)");
 		comboInfoResiduo.addItem("Inf. residues (+)");
 		comboInfoResiduo.addItem("Inf. residues (-)");
+		comboInfoResiduo.addItem("Inf. residues (Altitude)");
+		comboInfoResiduo.addItem("Inf. residues (Level)");
 		comboInfoResiduo.addActionListener(this);
 		
 		//4
@@ -1262,7 +1264,15 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 		else if(comboResiduo.getSelectedItem().equals("Ultimate Attribute opening")){
 			UltimateAttributeOpening r = new UltimateAttributeOpening((ComponentTree) tree);
 			r.computeUAO( getAttributeValue(), getAttributeType(), getPruningSelected(), getFilteringResidues());
-			if(comboInfoResiduo.getSelectedIndex() > 2){
+			if(comboInfoResiduo.getSelectedItem().equals("Inf. residues (Altitude)")){
+				flagColor = false;
+				updateImage(r.getAttributeResidues(Attribute.ALTITUDE));
+			}
+			else if(comboInfoResiduo.getSelectedItem().equals("Inf. residues (Level)")){
+				flagColor = false;
+				updateImage(r.getAttributeResidues(Attribute.LEVEL));
+			}
+			else if(comboInfoResiduo.getSelectedIndex() > 2){
 				flagColor = true;
 				updateImage(r.getAssociateIndexImage());	
 			}else{
@@ -1304,14 +1314,29 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 				flagColor = true;
 				updateImage(uaoAutoDual.getAssociateIndexImageNeg());
 			}
-			
+			else if(comboInfoResiduo.getSelectedItem().equals("Inf. residues (Altitude)")){
+				flagColor = true;
+				updateImage(uaoAutoDual.getAttributeResidues(Attribute.ALTITUDE));
+			}
+			else if(comboInfoResiduo.getSelectedItem().equals("Inf. residues (Level)")){
+				flagColor = true;
+				updateImage(uaoAutoDual.getAttributeResidues(Attribute.LEVEL));
+			}
 			
 			
 		}
 		else if(comboResiduo.getSelectedItem().equals("Ultimate Attribute closing")){
 			UltimateAttributeOpening r = new UltimateAttributeOpening((ComponentTree) tree);
 			r.computeUAO( attributeValue, getAttributeType(), getPruningSelected(), getFilteringResidues());
-			if(comboInfoResiduo.getSelectedIndex() > 2){
+			if(comboInfoResiduo.getSelectedItem().equals("Inf. residues (Altitude)")){
+				flagColor = false;
+				updateImage(r.getAttributeResidues(Attribute.ALTITUDE));
+			}
+			else if(comboInfoResiduo.getSelectedItem().equals("Inf. residues (Level)")){
+				flagColor = false;
+				updateImage(r.getAttributeResidues(Attribute.LEVEL));
+			}
+			else if(comboInfoResiduo.getSelectedIndex() > 2){
 				flagColor = true;
 				updateImage(r.getAssociateIndexImage());	
 			}else{
@@ -1340,6 +1365,14 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 			}else if(comboInfoResiduo.getSelectedItem().equals("Inf. residues (-)")){
 				flagColor = true;
 				updateImage(r.getAssociateImageNeg());
+			}
+			else if(comboInfoResiduo.getSelectedItem().equals("Inf. residues (Altitude)")){
+				flagColor = false;
+				updateImage(r.getAttributeResidues(Attribute.ALTITUDE));
+			}
+			else if(comboInfoResiduo.getSelectedItem().equals("Inf. residues (Level)")){
+				flagColor = false;
+				updateImage(r.getAttributeResidues(Attribute.LEVEL));
 			}
 			
 		}
