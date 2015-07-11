@@ -622,6 +622,114 @@ public class HistogramOfBranch {
 	}
 	
 
+	public void run(MorphologicalTreeFiltering treeIn, boolean selected[]) {
+		ArrayList<Float> listPx = new ArrayList<Float>();
+		ArrayList<Float> listPy = new ArrayList<Float>();
+
+		ArrayList<Float> listPxSelected = null;
+		ArrayList<Float> listPySelected = null;
+		
+		
+		if(treeIn instanceof ComponentTree){	
+			ComponentTree tree = (ComponentTree) treeIn;
+			boolean selected2[] = new boolean[tree.getNumNode()];
+			ArrayList<NodeCT> listEVPath = new ArrayList<NodeCT>();
+				
+			NodeCT node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
+			selected2[node.hashCode()] = true;
+			listPx.add(new Float(node.getLevel()));
+			listPy.add(getAttribute(node));
+			while (node.getParent() != null) {
+				if(getAttribute(node) != getAttribute(node.getParent())){
+					node = node.getParent();
+					selected2[node.hashCode()] = true;
+					listPx.add(new Float(node.getLevel()));
+					listPy.add(getAttribute(node));
+					if(selected[node.hashCode()]){
+						listEVPath.add(node);
+					}
+				}else{
+					node = node.getParent();
+				}
+			}
+				
+			listPxSelected = new ArrayList<Float>();
+			listPySelected = new ArrayList<Float>();
+			for(NodeCT n: listEVPath){
+				listPxSelected.add(new Float(n.getLevel()));
+				listPySelected.add(getAttribute(n));
+			}
+			//VisualizationComponentTree.getInstance(prunedTree, selected, selected2).setVisible(true);
+		}else{
+			TreeOfShape tree = (TreeOfShape) treeIn;
+			boolean selected2[] = new boolean[tree.getNumNode()];
+			ArrayList<NodeToS> listEVPath = new ArrayList<NodeToS>();
+				
+			NodeToS node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
+			selected2[node.hashCode()] = true;
+			listPx.add(new Float(node.getLevel()));
+			listPy.add(getAttribute(node));
+			while (node.getParent() != null) {
+				if(getAttribute(node) != getAttribute(node.getParent())){
+					node = node.getParent();
+					selected2[node.hashCode()] = true;
+					listPx.add(new Float(node.getLevel()));
+					listPy.add(getAttribute(node));
+					if(selected[node.hashCode()]){
+						listEVPath.add(node);
+					}
+				}else{
+					node = node.getParent();
+				}
+					
+			}
+				
+			listPxSelected = new ArrayList<Float>();
+			listPySelected = new ArrayList<Float>();
+			for(NodeToS n: listEVPath){
+				listPxSelected.add(new Float(n.getLevel()));
+				listPySelected.add(getAttribute(n));
+			}
+				
+			
+		}
+		
+		float vPx[] = new float[listPx.size()];
+		float vPy[] = new float[listPy.size()];
+		for (int i = 0; i < listPx.size(); i++) {
+			vPx[i] = listPx.get(i);
+			vPy[i] = listPy.get(i);
+		}
+
+		Plot pw = new Plot("Attribute profile for the pixel (" + this.x + ", " + this.y + ")", "attribute value", "level", vPy, vPx);
+		double[] a = Tools.getMinMax(vPx);
+		double xmin = a[0], xmax = a[1];
+		a = Tools.getMinMax(vPy);
+		double ymin = a[0], ymax = a[1];
+		pw.setSize(1000, 500);
+		pw.setColor(Color.BLUE);
+		pw.setLimits(ymin-5, ymax-5, xmin-5, xmax+5);
+		
+		
+		if(listPxSelected != null){
+			float vPxEV[] = new float[listPxSelected.size()];
+			float vPyEV[] = new float[listPySelected.size()];
+			for (int i = 0; i < listPxSelected.size(); i++) {
+				vPxEV[i] = listPxSelected.get(i);
+				vPyEV[i] = listPySelected.get(i);
+				
+			}
+			pw.setColor(Color.RED);
+			pw.addPoints(vPyEV, vPxEV, Plot.CIRCLE);
+			pw.addPoints(vPyEV, vPxEV, Plot.BOX);
+			pw.addPoints(vPyEV, vPxEV, Plot.X);
+		}
+		pw.setColor(Color.BLACK);
+		pw.addPoints(vPy, vPx, Plot.CROSS);
+		pw.show();
+	}
+	
+
 	public void runPrimitivesFamily(MorphologicalTreeFiltering treeIn, int typePruning, int delta) {
 		ArrayList<Float> listPx = new ArrayList<Float>();
 		ArrayList<Float> listPy = new ArrayList<Float>();
@@ -908,92 +1016,6 @@ public class HistogramOfBranch {
 		pw.show();
 	}
 	
-	public void run_OLD(MorphologicalTreeFiltering treeIn, int typePruning, int delta) {
-		ArrayList<Float> listPx = new ArrayList<Float>();
-		ArrayList<Float> listPy = new ArrayList<Float>();
-
-		ArrayList<Float> listPxEV = null;
-		ArrayList<Float> listPyEV = null;
-		
-		
-		if(treeIn instanceof ComponentTree){	
-			ComponentTree tree = (ComponentTree) treeIn;
-			
-			ComputerExtinctionValueComponentTree ev = new ComputerExtinctionValueComponentTree(tree);
-			boolean selected[] = ev.getExtinctionValueNodeCT(indexAttr);
-			boolean selected2[] = new boolean[tree.getNumNode()];
-			ArrayList<NodeCT> listEVPath = new ArrayList<NodeCT>();
-			
-			NodeCT node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
-			selected2[node.hashCode()] = true;
-			listPx.add(new Float(node.getLevel()));
-			listPy.add(getAttribute(node));
-			while (node.getParent() != null) {
-				selected2[node.hashCode()] = true;
-				node = node.getParent();
-				listPx.add(new Float(node.getLevel()));
-				listPy.add(getAttribute(node));
-				if(selected[node.hashCode()]){
-					listEVPath.add(node);
-				}
-				
-			}
-			
-			listPxEV = new ArrayList<Float>();
-			listPyEV = new ArrayList<Float>();
-			for(NodeCT n: listEVPath){
-				listPxEV.add(new Float(n.getLevel()));
-				listPyEV.add(getAttribute(n));
-			}
-			
-			//VisualizationComponentTree.getInstance(tree).setVisible(true);
-			
-		}else{
-			TreeOfShape tree = (TreeOfShape) treeIn;
-			NodeToS node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
-			listPx.add(new Float(node.getLevel()));
-			listPy.add(getAttribute(node));
-			while (node.getParent() != null) {
-				node = node.getParent();
-				listPx.add(new Float(node.getLevel()));
-				listPy.add(getAttribute(node));
-			}
-		}
-		
-		float vPx[] = new float[listPx.size()];
-		float vPy[] = new float[listPy.size()];
-		for (int i = 0; i < listPx.size(); i++) {
-			vPx[i] = listPx.get(i);
-			vPy[i] = listPy.get(i);
-		}
-
-		Plot pw = new Plot("Histogram", "attribute","level", vPy, vPx);
-		double[] a = Tools.getMinMax(vPx);
-		double xmin = a[0], xmax = a[1];
-		a = Tools.getMinMax(vPy);
-		double ymin = a[0], ymax = a[1];
-		pw.setSize(1000, 500);
-		pw.setColor(Color.BLUE);
-		pw.setLimits(ymin-5, ymax-5, xmin-5, xmax+5);
-		
-		
-		if(listPxEV != null){
-			float vPxEV[] = new float[listPxEV.size()];
-			float vPyEV[] = new float[listPyEV.size()];
-			for (int i = 0; i < listPxEV.size(); i++) {
-				vPxEV[i] = listPxEV.get(i);
-				vPyEV[i] = listPyEV.get(i);
-				
-			}
-			pw.setColor(Color.RED);
-			pw.addPoints(vPyEV, vPxEV, Plot.CIRCLE);
-			pw.addPoints(vPyEV, vPxEV, Plot.BOX);
-			pw.addPoints(vPyEV, vPxEV, Plot.X);
-		}
-		pw.setColor(Color.BLACK);
-		pw.addPoints(vPy, vPx, Plot.CROSS);
-		pw.show();
-	}
 	
 	public boolean isFound(ArrayList<NodeCT> list, NodeCT node){
 		for(NodeCT n: list){

@@ -125,26 +125,21 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 		double rectMin = 0.3;
 		double rectMax = 0.95;
 		double ratioWHMin=0;
-		double ratioWHMax=8;
-		
+		double ratioWHMax=14;
 		double varianceMin=0;
 		double varianceMax=100;
-		double eccentMin=0.1;
-		double eccentMax=3;
-		double compactMin=0.0025;
-		double compactMax=0.05;
 		
-		String selectedNode = "--- no filtering ---";
+		String selectedNode = "MSER";
 		ParamTextLocation(){
 			areaMax=imgInput.getSize();
 			heightMax=imgInput.getHeight();
-			widthMax =imgInput.getWidth();
+			widthMax =imgInput.getWidth()/3;
 		}
 	}
 	private ParamTextLocation paramTextLocation;
 	
 	private class ParamMSER{
-		double maxVariation = 3;
+		double maxVariation = 0.5;
 		int minArea=10;
 		int maxArea=Integer.MAX_VALUE;
 		int attribute = Attribute.AREA;
@@ -288,27 +283,19 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 	//@Override
 	public void mouseClicked(MouseEvent e) {
 		if(analisysButton.isSelected()){
-			int mousex = e.getX();
-			int mousey = e.getY();
 			
-			int attr = 0;
-			if(comboAttributoResiduo.getSelectedItem().equals("Area"))
-				attr = 0;
-			else if(comboAttributoResiduo.getSelectedItem().equals("Volume"))
-				attr = 1;				
-			else if(comboAttributoResiduo.getSelectedItem().equals("Altitude"))
-				attr = 4;
-			else if(comboAttributoResiduo.getSelectedItem().equals("Height"))
-				attr = 2;
-			else if(comboAttributoResiduo.getSelectedItem().equals("Width"))
-				attr = 3;
+			imgPlus.getCanvas().mouseMoved(e);
+			
+			int mousex = imgPlus.getCanvas().offScreenX(e.getX());
+			int mousey = imgPlus.getCanvas().offScreenY(e.getY());
+			//System.out.printf("\n(%d, %d)\n",mousex, mousey);
 			
 			String pruningSelected = (String) this.comboPruningStrategy.getSelectedItem();
 			int typePruning = MorphologicalTreeFiltering.PRUNING;
 			if(pruningSelected.equals("Gradual transition")){
 				typePruning = MorphologicalTreeFiltering.PRUNING_GRADUAL_TRANSITION;
 			}
-			else if(pruningSelected.equals("MSER")){
+			else if(pruningSelected.equals("MSER") || pruningSelected.equals("MSER by rank")){
 				typePruning = MorphologicalTreeFiltering.PRUNING_MSER;
 			}
 			
@@ -317,10 +304,9 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 			}
 			
 			if(comboResiduo.getSelectedItem().equals("Max{ ultimate Attribute opening and closing }")){
-				new HistogramOfBranch(attr, mousex, mousey).run(this.minTree, typePruning, paramDeltaOfPruningStrategies.getValue());
-				new HistogramOfBranch(attr, mousex, mousey).run(this.maxTree, typePruning, paramDeltaOfPruningStrategies.getValue());
+				new HistogramOfBranch(getAttributeType(), mousex, mousey).run(this.minTree, typePruning, paramDeltaOfPruningStrategies.getValue());
+				new HistogramOfBranch(getAttributeType(), mousex, mousey).run(this.maxTree, typePruning, paramDeltaOfPruningStrategies.getValue());
 			}
-			
 			else if(comboResiduo.getSelectedItem().equals("Ultimate leveling by reconstruction")){
 
 				int type = 0;
@@ -346,16 +332,28 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 				ulr = new UltimateLevelingByReconstruction(tree1.getInputImage(), tree1, type);
 				ulr.enableComputerDistribution(true);
 				ulr.computeUAO(attributeValueMaxResiduo.getValue(), 1);
-				new EvolutionResidue(ulr.getNodeDistribuition(), tree1,  mousex, mousey);
-			}
-			else{
+				new EvolutionResidue(mousex, mousey).patternSpectrumUAO(ulr.getNodeDistribuition(), tree1);
 				
-				UltimateAttributeOpening r = new UltimateAttributeOpening( (ComponentTree) tree );
+			}
+			else if(comboResiduo.getSelectedItem().equals("Ultimate Attribute opening") || comboResiduo.getSelectedItem().equals("Ultimate Attribute closing")){
+				ComponentTree tree = ((ComponentTree) this.tree).getClone();
+				UltimateAttributeOpening r = new UltimateAttributeOpening( tree );
 				r.enableComputerDistribution(true);
 				r.computeUAO( getAttributeValue(), getAttributeType(), getPruningSelected(), getFilteringResidues());
-				new EvolutionResidue(r.getNodeDistribuition(), new ConnectedFilteringByComponentTree(imgInput, adj8, tree.getRoot().isNodeMaxtree()),  mousex, mousey);
+				new EvolutionResidue(mousex, mousey).patternSpectrumUAO(r.getNodeDistribuition(), tree);
+				new HistogramOfBranch(getAttributeType(), mousex, mousey).run(this.tree, getPruningSelected().getMappingSelectedNodes());
 				
 			}
+			else if (comboResiduo.getSelectedItem().equals("Ultimate grain filter")){
+				TreeOfShape tree = ((TreeOfShape) this.tree).getClone();
+				//TreeOfShape tree = new ConnectedFilteringByTreeOfShape(imgInputOriginal);
+				UltimateGrainFilter r = new UltimateGrainFilter( tree );
+				r.enableComputerDistribution(true);
+				r.computeUGF( getAttributeValue(), getAttributeType(), getPruningSelected(), getFilteringResidues());
+				new EvolutionResidue(mousex, mousey).patternSpectrumUGF(r.getNodeDistribuition(), tree);
+				new HistogramOfBranch(getAttributeType(), mousex, mousey).run(this.tree, getPruningSelected().getMappingSelectedNodes());
+			}
+			
 			analisysButton.setSelected(false);
 			analisysButton.setText("Residual evolution");
 			setCursor(DEFAULT_CURSOR);
@@ -414,8 +412,8 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 		comboAttributoResiduo.addItem("Opening");
 		comboAttributoResiduo.addItem("Dilation / Erosion");
 		comboAttributoResiduo.addItem("Opening / Closing");
-		comboAttributoResiduo.addItem("Median");
-		comboAttributoResiduo.addItem("Gaussian");
+		//comboAttributoResiduo.addItem("Median");
+		//comboAttributoResiduo.addItem("Gaussian");
 		
 		comboAttributoResiduo.addActionListener(this);
 		
@@ -651,8 +649,8 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 				((PruningBasedTextLocation)pruning).setParametersMSER(delta, paramMSER.maxVariation, paramMSER.attribute);
 				((PruningBasedTextLocation)pruning).setParametersTBMR(paramTBMR.minArea, paramTBMR.maxArea);
 				((PruningBasedTextLocation)pruning).setParameters(paramTextLocation.areaMin, paramTextLocation.areaMax, paramTextLocation.heightMin, paramTextLocation.heightMax, paramTextLocation.widthMin, paramTextLocation.widthMax,
-						paramTextLocation.numHoleMin, paramTextLocation.numHoleMax, paramTextLocation.rectMin, paramTextLocation.rectMax, paramTextLocation.ratioWHMin, paramTextLocation.ratioWHMax, paramTextLocation.varianceMin, paramTextLocation.varianceMax,
-						paramTextLocation.eccentMin, paramTextLocation.eccentMax, paramTextLocation.compactMin, paramTextLocation.compactMax, paramTextLocation.selectedNode);
+						paramTextLocation.numHoleMin, paramTextLocation.numHoleMax, paramTextLocation.rectMin, paramTextLocation.rectMax, paramTextLocation.ratioWHMin, paramTextLocation.ratioWHMax, paramTextLocation.varianceMin, 
+						paramTextLocation.varianceMax, paramTextLocation.selectedNode);
 				return pruning.getMappingSelectedNodes();
 			}
 			else if(pruningSelected.equals("---- Circularity ----")){
@@ -707,8 +705,8 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 				((PruningBasedTextLocation)pruning).setParametersMSER(delta, paramMSER.maxVariation, paramMSER.attribute);
 				((PruningBasedTextLocation)pruning).setParametersTBMR(paramTBMR.minArea, paramTBMR.maxArea);
 				((PruningBasedTextLocation)pruning).setParameters(paramTextLocation.areaMin, paramTextLocation.areaMax, paramTextLocation.heightMin, paramTextLocation.heightMax, paramTextLocation.widthMin, paramTextLocation.widthMax,
-						paramTextLocation.numHoleMin, paramTextLocation.numHoleMax, paramTextLocation.rectMin, paramTextLocation.rectMax, paramTextLocation.ratioWHMin, paramTextLocation.ratioWHMax, paramTextLocation.varianceMin, paramTextLocation.varianceMax,
-						paramTextLocation.eccentMin, paramTextLocation.eccentMax, paramTextLocation.compactMin, paramTextLocation.compactMax, paramTextLocation.selectedNode);
+						paramTextLocation.numHoleMin, paramTextLocation.numHoleMax, paramTextLocation.rectMin, paramTextLocation.rectMax, paramTextLocation.ratioWHMin, paramTextLocation.ratioWHMax, paramTextLocation.varianceMin, 
+						paramTextLocation.varianceMax, paramTextLocation.selectedNode);
 				return pruning.getMappingSelectedNodes();
 			}
 			else if(pruningSelected.equals("---- Circularity ----")){
@@ -846,10 +844,7 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 					paramTextLocation.ratioWHMax = gd.getNextNumber();
 					paramTextLocation.varianceMin = gd.getNextNumber();
 					paramTextLocation.varianceMax = gd.getNextNumber();
-					//paramTextLocation.eccentMin = gd.getNextNumber();
-					//paramTextLocation.eccentMax = gd.getNextNumber();
-					//paramTextLocation.compactMin = gd.getNextNumber();
-					//paramTextLocation.compactMax = gd.getNextNumber();
+					
 					paramTextLocation.selectedNode = gd.getNextChoice();
 					updateExtractionResidues();
 				}
@@ -955,6 +950,7 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 				if(!isValidPrimitiveType()){
 					comboAttributoResiduo.setSelectedIndex(1);
 				}
+				tree = this.maxTree;
 				updateExtractionResidues();
 			}
 			if(comboResiduo.getSelectedItem().equals("Ultimate leveling by reconstruction")){
@@ -974,7 +970,7 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 				if(!isValidPrimitiveType()){
 					comboAttributoResiduo.setSelectedIndex(1);
 				}
-				tree = new ConnectedFilteringByComponentTree(imgInput, adj8, false);
+				tree = this.minTree;//new ConnectedFilteringByComponentTree(imgInput, adj8, false);
 				updateExtractionResidues();
 			}
 			else if(comboResiduo.getSelectedItem().equals("Ultimate grain filter")){
@@ -998,6 +994,10 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 		else if(comboFilterRegion == e.getSource()){
 			if(comboFilterRegion.getSelectedItem().equals("MSER")){
 				paramDeltaOfFilter.setValue(7);
+				paramDeltaOfFilter.repaint();
+			}
+			else if(comboFilterRegion.getSelectedItem().equals("---- Text location ----")){
+				paramDeltaOfFilter.setValue(3);
 				paramDeltaOfFilter.repaint();
 			}
 			updateExtractionResidues();
