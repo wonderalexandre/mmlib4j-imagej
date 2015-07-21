@@ -233,13 +233,13 @@ public class MorphologicalOperatorBySE  extends PlugInFrame implements ActionLis
 			imgOut = MorphologicalOperators.erosion(imgInput, adj);
 
 			if(isReconstruction.isSelected())
-				imgOut = recMorph.infReconstruction(imgOut);
+				imgOut = recMorph.reconstructionByDilation(imgOut);
 				//imgOut = maxtree.reconstructionMorphological(imgOut);
 		}
 		else if(comboMorphologicalOperator.getSelectedItem().equals("Dilation")){
 			imgOut = MorphologicalOperators.dilation(imgInput, adj);
 			if(isReconstruction.isSelected())
-				imgOut = recMorph.supReconstruction(imgOut); 
+				imgOut = recMorph.reconstructionByErosion(imgOut); 
 				//mintree.reconstructionMorphological(imgOut);
 		}
 
@@ -259,14 +259,14 @@ public class MorphologicalOperatorBySE  extends PlugInFrame implements ActionLis
 			imgOut = imgInput.duplicate();
 			imgOut.add((int)-attributeValue*2);
 			if(isReconstruction.isSelected())
-				imgOut = recMorph.infReconstruction(imgOut);
+				imgOut = recMorph.reconstructionByDilation(imgOut);
 		}
 		else if(comboMorphologicalOperator.getSelectedItem().equals("Add (+)")){
 			imgOut = imgInput.duplicate();
 			imgOut.add((int)attributeValue*2);
 			
 			if(isReconstruction.isSelected())
-				imgOut = recMorph.supReconstruction(imgOut);
+				imgOut = recMorph.reconstructionByErosion(imgOut);
 		}
 		
 		
@@ -314,14 +314,14 @@ public class MorphologicalOperatorBySE  extends PlugInFrame implements ActionLis
 			imgOut = MorphologicalOperators.opening(imgInput, adj);
 			
 			if(isReconstruction.isSelected()){
-				imgOut = recMorph.infReconstruction(imgOut);
+				imgOut = recMorph.reconstructionByDilation(imgOut);
 			}
 		}
 		else if(comboMorphologicalOperator.getSelectedItem().equals("Closing")){
 			imgOut = MorphologicalOperators.closing(imgInput, adj);
 			
 			if(isReconstruction.isSelected())
-				imgOut = recMorph.supReconstruction(imgOut);
+				imgOut = recMorph.reconstructionByErosion(imgOut);
 		}
 		else if(comboMorphologicalOperator.getSelectedItem().equals("Black tophat")){
 			imgOut = MorphologicalOperators.closingTopHat(imgInput, adj);
