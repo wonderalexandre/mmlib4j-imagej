@@ -437,7 +437,7 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 		comboPruningStrategy.addItem("Extinction value");
 		comboPruningStrategy.addItem("Gradual transition");
 		//comboPruningStrategy.addItem("MSER");
-		//comboPruningStrategy.addItem("TBMR");
+		comboPruningStrategy.addItem("TBMR");
 		
 		comboPruningStrategy.addActionListener(this);
 		
