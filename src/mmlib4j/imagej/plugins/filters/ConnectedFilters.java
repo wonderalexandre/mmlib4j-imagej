@@ -122,7 +122,7 @@ public class ConnectedFilters extends PlugInFrame implements MouseListener, Acti
 		comboAttributoFilter.setBorder(BorderFactory.createTitledBorder("Attribute type"));
 		comboAttributoFilter.addItem("Area");
 		comboAttributoFilter.addItem("Volume");
-		comboAttributoFilter.addItem("Altitude");
+		//comboAttributoFilter.addItem("Altitude");
 		comboAttributoFilter.addItem("Height");
 		comboAttributoFilter.addItem("Width");
 		//comboAttributoFilter.addItem("Length major axes");
