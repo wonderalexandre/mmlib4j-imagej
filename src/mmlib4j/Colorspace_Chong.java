@@ -2,12 +2,10 @@ package mmlib4j;
 
 
 import ij.ImagePlus;
-import ij.gui.GenericDialog;
 import ij.plugin.filter.PlugInFilter;
 import ij.process.ColorProcessor;
 import ij.process.ImageProcessor;
 import mmlib4j.imagej.utils.ImageJAdapter;
-import mmlib4j.imagej.utils.ImageUtils;
 import mmlib4j.utils.ImageBuilder;
 
 /**

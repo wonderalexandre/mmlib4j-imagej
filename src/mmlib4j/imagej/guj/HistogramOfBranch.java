@@ -5,8 +5,8 @@ import ij.util.Tools;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import mmlib4j.representation.tree.MorphologicalTreeFiltering;
 import mmlib4j.representation.tree.InfoPrunedTree;
+import mmlib4j.representation.tree.MorphologicalTreeFiltering;
 import mmlib4j.representation.tree.attribute.Attribute;
 import mmlib4j.representation.tree.attribute.ComputerExtinctionValueComponentTree;
 import mmlib4j.representation.tree.attribute.ComputerExtinctionValueTreeOfShapes;
