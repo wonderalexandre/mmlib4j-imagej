@@ -37,7 +37,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>mmlib4j</groupId>
-			<artifactId>mmlib4j-api</artifactId>
+			<artifactId>mmlib4j</artifactId>
 			<version>1.0</version>
 			<exclusions>
 				<exclusion>
