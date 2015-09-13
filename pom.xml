@@ -18,17 +18,20 @@
 					<target>1.6</target>
 				</configuration>
 			</plugin>
-
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.6</version>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
 				<configuration>
-					<archive>
-						<manifest>
-							<mainClass>mmlib4j.imagej.utils.ImageJTest</mainClass>
-						</manifest>
-					</archive>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -113,6 +116,7 @@
 			<groupId>net.imagej</groupId>
 			<artifactId>ij</artifactId>
 			<version>1.48v</version>
+			<scope>provided</scope>
 		</dependency>
 
 	</dependencies>
