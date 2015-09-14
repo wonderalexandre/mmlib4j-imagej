@@ -32,6 +32,8 @@
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
+					<finalName>MMLib4J_v1</finalName>
+					<appendAssemblyId>false</appendAssemblyId>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -67,10 +69,6 @@
 					<groupId>net.sf.jung</groupId>
 					<artifactId>jung-visualization</artifactId>
 				</exclusion>
-				<exclusion>
-					<groupId>net.imagej</groupId>
-					<artifactId>ij</artifactId>
-				</exclusion>
 			</exclusions>
 		</dependency>
 
@@ -80,16 +78,26 @@
 			<version>4.10</version>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
-			<groupId>org.apache.servicemix.bundles</groupId>
-			<artifactId>org.apache.servicemix.bundles.collections-generic</artifactId>
-			<version>4.01_1</version>
+			<groupId>net.sourceforge.collections</groupId>
+			<artifactId>collections-generic</artifactId>
+			<version>4.01</version>
 		</dependency>
+
 		<dependency>
 			<groupId>colt</groupId>
 			<artifactId>colt</artifactId>
 			<version>1.2.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>
+					concurrent					
+					</groupId>
+					<artifactId>
+					concurrent					
+					</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.jung</groupId>
@@ -98,7 +106,7 @@
 			<exclusions>
 				<exclusion>
 					<groupId>org.apache.servicemix.bundles</groupId>
-			<artifactId>org.apache.servicemix.bundles.collections-generic</artifactId>
+					<artifactId>org.apache.servicemix.bundles.collections-generic</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
