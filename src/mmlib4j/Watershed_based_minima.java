@@ -7,7 +7,7 @@ import ij.gui.GenericDialog;
 import ij.plugin.filter.PlugInFilter;
 import ij.process.ByteProcessor;
 import ij.process.ImageProcessor;
-import mmlib4j.filtering.MorphologicalOperators;
+import mmlib4j.filtering.MorphologicalOperatorsBasedOnSE;
 import mmlib4j.imagej.utils.ImageJAdapter;
 import mmlib4j.imagej.utils.ImageUtils;
 import mmlib4j.images.GrayScaleImage;
@@ -30,7 +30,7 @@ public class Watershed_based_minima implements PlugInFilter {
 		long start = System.currentTimeMillis();
 		GrayScaleImage img = ImageJAdapter.toGrayScaleImage((ByteProcessor)ip);;
 		if(gradient){
-			img = MorphologicalOperators.gradient(img, AdjacencyRelation.getAdjacency8());
+			img = MorphologicalOperatorsBasedOnSE.gradient(img, AdjacencyRelation.getAdjacency8());
 		}
 		
 		GrayScaleImage imgMinima = RegionalMinimaByIFT.extractionOfRegionalMinima(img);

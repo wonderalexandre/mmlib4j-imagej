@@ -5,7 +5,7 @@ import ij.gui.GenericDialog;
 import ij.plugin.filter.PlugInFilter;
 import ij.process.ByteProcessor;
 import ij.process.ImageProcessor;
-import mmlib4j.filtering.MorphologicalOperators;
+import mmlib4j.filtering.MorphologicalOperatorsBasedOnSE;
 import mmlib4j.imagej.utils.ImageJAdapter;
 import mmlib4j.imagej.utils.ImageUtils;
 import mmlib4j.images.GrayScaleImage;
@@ -36,7 +36,7 @@ public class Morphological_gradient implements PlugInFilter {
 	
 	public void run(ImageProcessor ip) { 
 		ImageUtils.initMMorph4J();
-		GrayScaleImage imgOut = MorphologicalOperators.gradient(ImageJAdapter.toGrayScaleImage((ByteProcessor) ip), AdjacencyRelation.getCircular(raio));
+		GrayScaleImage imgOut = MorphologicalOperatorsBasedOnSE.gradient(ImageJAdapter.toGrayScaleImage((ByteProcessor) ip), AdjacencyRelation.getCircular(raio));
 		imgPlus.setProcessor("Morphological Gradient", ImageJAdapter.toByteProcessor(imgOut));
 		//ImagePlus plus = new ImagePlus("Morphological Gradient", ImageJAdapter.toByteProcessor(imgOut));
 		//plus.show();

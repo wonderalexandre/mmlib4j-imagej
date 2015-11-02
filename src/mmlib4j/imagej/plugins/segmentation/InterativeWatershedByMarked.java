@@ -30,7 +30,7 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import mmlib4j.filtering.MorphologicalOperators;
+import mmlib4j.filtering.MorphologicalOperatorsBasedOnSE;
 import mmlib4j.imagej.guj.ComboBoxColor;
 import mmlib4j.imagej.utils.ImageJAdapter;
 import mmlib4j.images.ColorImage;
@@ -88,7 +88,7 @@ public class InterativeWatershedByMarked extends PlugInFrame implements MouseLis
 		super("MMLib4J - Watershed");
 		this.imgPlus = imgPlus;
 		this.imgInput = ImageJAdapter.toGrayScaleImage( (ByteProcessor) imgPlus.getProcessor());
-		this.imgGrad = MorphologicalOperators.gradient(imgInput, adj);
+		this.imgGrad = MorphologicalOperatorsBasedOnSE.gradient(imgInput, adj);
 		this.imgCurrent = new BufferedImage(imgInput.getWidth(), imgInput.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
 		for(int x=0; x < imgInput.getWidth(); x++)
 			for(int y=0; y < imgInput.getHeight(); y++)
@@ -223,7 +223,7 @@ public class InterativeWatershedByMarked extends PlugInFrame implements MouseLis
 	}
 	
 	public void apply(){
-		GrayScaleImage imgGrad = MorphologicalOperators.gradient(imgInput, adj);
+		GrayScaleImage imgGrad = MorphologicalOperatorsBasedOnSE.gradient(imgInput, adj);
 		HashMap<Integer, Integer> labels = new HashMap<Integer, Integer>();
 		
 		GrayScaleImage imgM = ImageFactory.createGrayScaleImage(32, imgInput.getWidth(), imgInput.getHeight());

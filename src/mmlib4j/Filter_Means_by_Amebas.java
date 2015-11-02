@@ -44,7 +44,7 @@ public class Filter_Means_by_Amebas implements PlugInFilter {
 		
 		
 		//filtro da media sem amebas
-		GrayScaleImage imgMedia = ImageFactory.createGrayScaleImage(img);
+		GrayScaleImage imgMedia = ImageFactory.createGrayScaleImage(img.getWidth(), img.getHeight());
 		AdjacencyRelation adj = AdjacencyRelation.getCircular(raio);
 		for(int pixelP=0; pixelP < img.getSize(); pixelP++){
 			int cont = 0;
@@ -58,7 +58,7 @@ public class Filter_Means_by_Amebas implements PlugInFilter {
 		
 		//filtro da media com amebas
 		int threshold = 50;
-		GrayScaleImage imgMediaAboema = ImageFactory.createGrayScaleImage(img);
+		GrayScaleImage imgMediaAboema = ImageFactory.createGrayScaleImage(img.getWidth(), img.getHeight());
 		AdjacencyRelationByAmoebas adjAmoeba = AdjacencyRelationByAmoebas.getCircular(raio);
 		for(int pixelP=0; pixelP < img.getSize(); pixelP++){
 			int cont = 0;
