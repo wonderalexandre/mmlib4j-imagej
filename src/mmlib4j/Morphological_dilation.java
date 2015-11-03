@@ -38,7 +38,6 @@ public class Morphological_dilation implements PlugInFilter {
 	
 	public void run(ImageProcessor ip) { 
 		ImageUtils.initMMorph4J();
-
 		
 		if(ip instanceof ColorProcessor){
 			ColorProcessor imgRGB = (ColorProcessor) ip;
@@ -64,11 +63,6 @@ public class Morphological_dilation implements PlugInFilter {
 			//plus.show();
 			
 		}
-		GrayScaleImage imgOut = MorphologicalOperatorsBasedOnSE.dilation(ImageJAdapter.toGrayScaleImage((ByteProcessor) ip), AdjacencyRelation.getCircular(raio));
-		imgPlus.setProcessor("Dilation", ImageJAdapter.toByteProcessor(imgOut));
-		//ImagePlus plus = new ImagePlus("Morphological Dilation", ImageJAdapter.toByteProcessor(imgOut));
-		//plus.show();
-
 		
 	}
 	

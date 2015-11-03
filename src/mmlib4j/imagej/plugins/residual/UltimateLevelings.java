@@ -572,8 +572,8 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 			//ComponentTree treeCT = (ComponentTree) this.tree;
 			String pruningSelected = (String) this.comboPruningStrategy.getSelectedItem();
 			if(pruningSelected.equals("Gradual transition")){
+				System.out.println("ComponentTree - Gradual transition");
 				int gradualTrans = paramDeltaOfPruningStrategies.getValue();
-				System.out.println("ComponentTree - Gradual transition - Delta:" + gradualTrans);
 				return new PruningBasedGradualTransition(this.tree, getAttributeType(), gradualTrans);
 			}
 			else if(pruningSelected.equals("MSER")){
@@ -596,8 +596,8 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 			//TreeOfShape tree = (TreeOfShape) this.tree;
 			String pruningSelected = (String) this.comboPruningStrategy.getSelectedItem();
 			if(pruningSelected.equals("Gradual transition")){
+				System.out.println("TreeOfShape - Gradual transition");
 				int gradualTrans = paramDeltaOfPruningStrategies.getValue();
-				System.out.println("TreeOfShape - Gradual transition - Delta:" + gradualTrans);
 				return new PruningBasedGradualTransition(this.tree, getAttributeType(), gradualTrans);
 			}
 			else if(pruningSelected.equals("MSER")){
