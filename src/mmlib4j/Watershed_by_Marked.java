@@ -11,7 +11,7 @@ import ij.process.ImageProcessor;
 
 import java.util.HashMap;
 
-import mmlib4j.filtering.MorphologicalOperators;
+import mmlib4j.filtering.MorphologicalOperatorsBasedOnSE;
 import mmlib4j.imagej.utils.ImageJAdapter;
 import mmlib4j.imagej.utils.ImageUtils;
 import mmlib4j.images.ColorImage;
@@ -41,7 +41,7 @@ public class Watershed_by_Marked implements PlugInFilter {
 
 		GrayScaleImage img = ImageJAdapter.toGrayScaleImage((ByteProcessor)imgF);;
 		if(gradient){
-			img = MorphologicalOperators.gradient(img, AdjacencyRelation.getAdjacency8());
+			img = MorphologicalOperatorsBasedOnSE.gradient(img, AdjacencyRelation.getAdjacency8());
 		}
 		
 		ColorImage markedC =ImageJAdapter.toColorImage(imgG); 

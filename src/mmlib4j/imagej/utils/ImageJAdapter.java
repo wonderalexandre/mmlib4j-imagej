@@ -23,11 +23,11 @@ import mmlib4j.images.impl.ImageFactory;
 public class ImageJAdapter {
 	
 	public static GrayScaleImage toGrayScaleImage(ByteProcessor ip){
-		return ImageFactory.createGrayScaleImage(ImageFactory.DEPTH_8BITS, ip.getPixels(), ip.getWidth(), ip.getHeight()); 
+		return ImageFactory.createReferenceGrayScaleImage(ImageFactory.DEPTH_8BITS, ip.getPixels(), ip.getWidth(), ip.getHeight()); 
 	}
 	
 	public static GrayScaleImage toGrayScaleImage(ShortProcessor ip){
-		return ImageFactory.createGrayScaleImage(ImageFactory.DEPTH_16BITS, ip.getPixels(), ip.getWidth(), ip.getHeight()); 
+		return ImageFactory.createReferenceGrayScaleImage(ImageFactory.DEPTH_16BITS, ip.getPixels(), ip.getWidth(), ip.getHeight()); 
 	}
 	
 	public static BinaryImage toBinaryImage(ByteProcessor ip){
@@ -41,7 +41,7 @@ public class ImageJAdapter {
 	}
 	
 	public static ColorImage toColorImage(ColorProcessor ip){
-		return ImageFactory.createColorImage((int[])ip.getPixels(), ip.getWidth(), ip.getHeight());
+		return ImageFactory.createReferenceColorImage((int[])ip.getPixels(), ip.getWidth(), ip.getHeight());
 	}  
 	
 	

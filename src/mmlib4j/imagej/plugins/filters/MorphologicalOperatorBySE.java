@@ -22,7 +22,7 @@ import javax.swing.event.ChangeListener;
 
 import mmlib4j.datastruct.SimpleLinkedList;
 import mmlib4j.filtering.LinearFilters;
-import mmlib4j.filtering.MorphologicalOperators;
+import mmlib4j.filtering.MorphologicalOperatorsBasedOnSE;
 import mmlib4j.filtering.ToggleMapping;
 import mmlib4j.imagej.utils.ImageJAdapter;
 import mmlib4j.images.ColorImage;
@@ -230,14 +230,14 @@ public class MorphologicalOperatorBySE  extends PlugInFrame implements ActionLis
 		GrayScaleImage imgOut = null;
 		
 		if(comboMorphologicalOperator.getSelectedItem().equals("Erosion")){
-			imgOut = MorphologicalOperators.erosion(imgInput, adj);
+			imgOut = MorphologicalOperatorsBasedOnSE.erosion(imgInput, adj);
 
 			if(isReconstruction.isSelected())
 				imgOut = recMorph.reconstructionByDilation(imgOut);
 				//imgOut = maxtree.reconstructionMorphological(imgOut);
 		}
 		else if(comboMorphologicalOperator.getSelectedItem().equals("Dilation")){
-			imgOut = MorphologicalOperators.dilation(imgInput, adj);
+			imgOut = MorphologicalOperatorsBasedOnSE.dilation(imgInput, adj);
 			if(isReconstruction.isSelected())
 				imgOut = recMorph.reconstructionByErosion(imgOut); 
 				//mintree.reconstructionMorphological(imgOut);
@@ -285,7 +285,7 @@ public class MorphologicalOperatorBySE  extends PlugInFrame implements ActionLis
 				familyAdj = AdjacencyRelation.getFamilyHorizontal(1, (int)attributeValue, 1);
 			}
 			
-			imgOut = MorphologicalOperators.asfCloseOpen(imgInput, familyAdj);
+			imgOut = MorphologicalOperatorsBasedOnSE.asfCloseOpen(imgInput, familyAdj);
 			
 			if(isReconstruction.isSelected())
 				imgOut = recMorph.selfReconstruction(imgOut);
@@ -305,32 +305,32 @@ public class MorphologicalOperatorBySE  extends PlugInFrame implements ActionLis
 				familyAdj = AdjacencyRelation.getFamilyHorizontal(1, (int)attributeValue, 1);
 			}
 			
-			imgOut = MorphologicalOperators.asfOpenClose(imgInput, familyAdj);
+			imgOut = MorphologicalOperatorsBasedOnSE.asfOpenClose(imgInput, familyAdj);
 			
 			if(isReconstruction.isSelected())
 				imgOut = recMorph.selfReconstruction(imgOut);
 		}	
 		else if(comboMorphologicalOperator.getSelectedItem().equals("Opening")){
-			imgOut = MorphologicalOperators.opening(imgInput, adj);
+			imgOut = MorphologicalOperatorsBasedOnSE.opening(imgInput, adj);
 			
 			if(isReconstruction.isSelected()){
 				imgOut = recMorph.reconstructionByDilation(imgOut);
 			}
 		}
 		else if(comboMorphologicalOperator.getSelectedItem().equals("Closing")){
-			imgOut = MorphologicalOperators.closing(imgInput, adj);
+			imgOut = MorphologicalOperatorsBasedOnSE.closing(imgInput, adj);
 			
 			if(isReconstruction.isSelected())
 				imgOut = recMorph.reconstructionByErosion(imgOut);
 		}
 		else if(comboMorphologicalOperator.getSelectedItem().equals("Black tophat")){
-			imgOut = MorphologicalOperators.closingTopHat(imgInput, adj);
+			imgOut = MorphologicalOperatorsBasedOnSE.closingTopHat(imgInput, adj);
 			
 			if(isReconstruction.isSelected())
 				imgOut = recMorph.selfReconstruction(imgOut);
 		}
 		else if(comboMorphologicalOperator.getSelectedItem().equals("White tophat")){
-			imgOut = MorphologicalOperators.openingTopHat(imgInput, adj);
+			imgOut = MorphologicalOperatorsBasedOnSE.openingTopHat(imgInput, adj);
 			
 			if(isReconstruction.isSelected())
 				imgOut = recMorph.selfReconstruction(imgOut);
@@ -349,17 +349,17 @@ public class MorphologicalOperatorBySE  extends PlugInFrame implements ActionLis
 				imgOut = recMorph.selfReconstruction(imgOut);
 		}	
 		else if(comboMorphologicalOperator.getSelectedItem().equals("Gradient")){
-			imgOut = MorphologicalOperators.gradient(imgInput, adj);
+			imgOut = MorphologicalOperatorsBasedOnSE.gradient(imgInput, adj);
 			if(isReconstruction.isSelected())
 				imgOut = recMorph.selfReconstruction(imgOut);
 		}	
 		else if(comboMorphologicalOperator.getSelectedItem().equals("Gradient (internal)")){
-			imgOut = MorphologicalOperators.gradientInternal(imgInput, adj);
+			imgOut = MorphologicalOperatorsBasedOnSE.gradientInternal(imgInput, adj);
 			if(isReconstruction.isSelected())
 				imgOut = recMorph.selfReconstruction(imgOut);
 		}
 		else if(comboMorphologicalOperator.getSelectedItem().equals("Gradient (external)")){
-			imgOut = MorphologicalOperators.gradientExternal(imgInput, adj);
+			imgOut = MorphologicalOperatorsBasedOnSE.gradientExternal(imgInput, adj);
 			if(isReconstruction.isSelected())
 				imgOut = recMorph.selfReconstruction(imgOut);
 		}

@@ -5,7 +5,7 @@ import ij.gui.GenericDialog;
 import ij.plugin.filter.PlugInFilter;
 import ij.process.ByteProcessor;
 import ij.process.ImageProcessor;
-import mmlib4j.filtering.MorphologicalOperators;
+import mmlib4j.filtering.MorphologicalOperatorsBasedOnSE;
 import mmlib4j.imagej.utils.ImageJAdapter;
 import mmlib4j.images.GrayScaleImage;
 import mmlib4j.representation.tree.componentTree.ReconstructionMorphological;
@@ -24,7 +24,7 @@ public class Opening_by_reconstruction implements PlugInFilter {
 	
 	public void run(ImageProcessor ip) {
 		GrayScaleImage f = ImageJAdapter.toGrayScaleImage((ByteProcessor) ip);
-		GrayScaleImage g = MorphologicalOperators.opening(f, AdjacencyRelation.getCircular(raioEE));
+		GrayScaleImage g = MorphologicalOperatorsBasedOnSE.opening(f, AdjacencyRelation.getCircular(raioEE));
 		ReconstructionMorphological rec = new ReconstructionMorphological(f, AdjacencyRelation.getCircular(raio), true);
 		GrayScaleImage imgOut = rec.reconstructionByDilation(g);
 		

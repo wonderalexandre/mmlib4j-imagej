@@ -33,7 +33,7 @@ import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import mmlib4j.filtering.MorphologicalOperators;
+import mmlib4j.filtering.MorphologicalOperatorsBasedOnSE;
 import mmlib4j.filtering.residual.UltimateAttributeOpenClose;
 import mmlib4j.filtering.residual.UltimateAttributeOpening;
 import mmlib4j.filtering.residual.UltimateGrainFilter;
@@ -238,7 +238,7 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 				imgPlus.setProcessor( ImageJAdapter.toColorProcessor(Labeling.labeling(imgCurrent, adj8).randomColor()) );
 			}if(chkWS.isSelected()){
 				imgPlus.setTitle(titleImg + " - watershed");
-				GrayScaleImage imgGrad = MorphologicalOperators.gradient(imgInputOriginal, adj8);
+				GrayScaleImage imgGrad = MorphologicalOperatorsBasedOnSE.gradient(imgInputOriginal, adj8);
 				GrayScaleImage imgM = imgCurrent.duplicate();
 				imgM.replaceValue(0, imgM.maxValue()+1);
 				imgPlus.setProcessor( ImageJAdapter.toColorProcessor( WatershedByIFT.watershedByMarker(imgGrad, imgM).randomColor() ) );

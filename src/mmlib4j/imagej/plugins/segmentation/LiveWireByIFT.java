@@ -25,7 +25,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import mmlib4j.filtering.MorphologicalOperators;
+import mmlib4j.filtering.MorphologicalOperatorsBasedOnSE;
 import mmlib4j.imagej.guj.ComboBoxColor;
 import mmlib4j.imagej.utils.ImageJAdapter;
 import mmlib4j.images.GrayScaleImage;
@@ -148,7 +148,7 @@ public class LiveWireByIFT extends PlugInFrame implements MouseListener, ActionL
 		initialPen = true;
 		processedIFT = true;
 		numPointLivewire = 0;
-		imgGradient = MorphologicalOperators.gradient(imgInput, adj).getInvert();
+		imgGradient = MorphologicalOperatorsBasedOnSE.gradient(imgInput, adj).getInvert();
 		
 		lastMouseX = 0;
 		lastMouseY = 0;
