@@ -138,7 +138,7 @@ public class HistogramOfBranch {
 		if(treeIn instanceof ComponentTree){	
 			ComponentTree tree = (ComponentTree) treeIn;
 			
-			if (typePruning == MorphologicalTreeFiltering.EXTINCTION_VALUE){
+			if (typePruning == MorphologicalTreeFiltering.PRUNING_EXTINCTION_VALUE){
 				ComputerExtinctionValueComponentTree ev = new ComputerExtinctionValueComponentTree(tree);
 				boolean selected[] = ev.getExtinctionValueNodeCT(indexAttr, prunedTree);
 				boolean selected2[] = new boolean[tree.getNumNode()];
@@ -255,7 +255,7 @@ public class HistogramOfBranch {
 		}else{
 			TreeOfShape tree = (TreeOfShape) treeIn;
 			
-			if (typePruning == MorphologicalTreeFiltering.EXTINCTION_VALUE){
+			if (typePruning == MorphologicalTreeFiltering.PRUNING_EXTINCTION_VALUE){
 				ComputerExtinctionValueTreeOfShapes ev = new ComputerExtinctionValueTreeOfShapes(tree);
 				boolean selected[] = ev.getExtinctionValueNode(indexAttr, prunedTree);
 				boolean selected2[] = new boolean[tree.getNumNode()];
@@ -385,7 +385,7 @@ public class HistogramOfBranch {
 		if(treeIn instanceof ComponentTree){	
 			ComponentTree tree = (ComponentTree) treeIn;
 			
-			if (typePruning == MorphologicalTreeFiltering.EXTINCTION_VALUE){
+			if (typePruning == MorphologicalTreeFiltering.PRUNING_EXTINCTION_VALUE){
 				ComputerExtinctionValueComponentTree ev = new ComputerExtinctionValueComponentTree(tree);
 				boolean selected[] = ev.getExtinctionValueNodeCT(indexAttr);
 				boolean selected2[] = new boolean[tree.getNumNode()];
@@ -503,7 +503,7 @@ public class HistogramOfBranch {
 		}else{
 			TreeOfShape tree = (TreeOfShape) treeIn;
 			
-			if (typePruning == MorphologicalTreeFiltering.EXTINCTION_VALUE){
+			if (typePruning == MorphologicalTreeFiltering.PRUNING_EXTINCTION_VALUE){
 				ComputerExtinctionValueTreeOfShapes ev = new ComputerExtinctionValueTreeOfShapes(tree);
 				boolean selected[] = ev.getExtinctionValueNode(indexAttr, delta);
 				boolean selected2[] = new boolean[tree.getNumNode()];
@@ -741,7 +741,7 @@ public class HistogramOfBranch {
 		if(treeIn instanceof ComponentTree){	
 			ComponentTree tree = (ComponentTree) treeIn;
 			
-			if (typePruning == MorphologicalTreeFiltering.EXTINCTION_VALUE){
+			if (typePruning == MorphologicalTreeFiltering.PRUNING_EXTINCTION_VALUE){
 				ComputerExtinctionValueComponentTree ev = new ComputerExtinctionValueComponentTree(tree);
 				boolean selected[] = ev.getExtinctionValueNodeCT(indexAttr);
 				boolean selected2[] = new boolean[tree.getNumNode()];
@@ -880,7 +880,7 @@ public class HistogramOfBranch {
 		}else{
 			TreeOfShape tree = (TreeOfShape) treeIn;
 			
-			if (typePruning == MorphologicalTreeFiltering.EXTINCTION_VALUE){
+			if (typePruning == MorphologicalTreeFiltering.PRUNING_EXTINCTION_VALUE){
 				ComputerExtinctionValueTreeOfShapes ev = new ComputerExtinctionValueTreeOfShapes(tree);
 				boolean selected[] = ev.getExtinctionValueNode(indexAttr, delta);
 				boolean selected2[] = new boolean[tree.getNumNode()];

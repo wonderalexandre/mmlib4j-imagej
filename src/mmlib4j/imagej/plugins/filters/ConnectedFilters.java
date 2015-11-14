@@ -236,7 +236,7 @@ public class ConnectedFilters extends PlugInFrame implements MouseListener, Acti
 	
 	public int getPruningType(){
 		if(comboPruningFilter.getSelectedItem().equals("Extinction Value")){
-			return MorphologicalTreeFiltering.EXTINCTION_VALUE;
+			return MorphologicalTreeFiltering.PRUNING_EXTINCTION_VALUE;
 		}
 		else if(comboPruningFilter.getSelectedItem().equals("MSER")){
 			return MorphologicalTreeFiltering.PRUNING_MSER;
@@ -332,7 +332,7 @@ public class ConnectedFilters extends PlugInFrame implements MouseListener, Acti
 	public InfoPrunedTree processPrunedTree(){
 		InfoPrunedTree prunedTree = null;
 		ConnectedFilteringByComponentTree ct = (ConnectedFilteringByComponentTree)tree;
-		if(lastPruning == MorphologicalTreeFiltering.EXTINCTION_VALUE){
+		if(lastPruning == MorphologicalTreeFiltering.PRUNING_EXTINCTION_VALUE){
 			prunedTree = ct.getPrunedTreeByExtinctionValue(lastAttributeValue, lastAttributeType);
 		}
 		else if(lastPruning == MorphologicalTreeFiltering.PRUNING_MSER){
@@ -387,7 +387,7 @@ public class ConnectedFilters extends PlugInFrame implements MouseListener, Acti
 		}
 		else if(event.getSource() == applyButtonFilter){
 			if(tree instanceof ComponentTree){
-				if(lastPruning == MorphologicalTreeFiltering.EXTINCTION_VALUE){
+				if(lastPruning == MorphologicalTreeFiltering.PRUNING_EXTINCTION_VALUE){
 					boolean selected[] = new ComputerExtinctionValueComponentTree((ComponentTree) tree).getExtinctionValueNodeCT(lastAttributeType, prunedTree);
 					VisualizationComponentTree.getInstance( prunedTree, selected, null ).setVisible(true);
 				}
@@ -417,7 +417,7 @@ public class ConnectedFilters extends PlugInFrame implements MouseListener, Acti
 				
 			}
 			else{
-				if(lastPruning == MorphologicalTreeFiltering.EXTINCTION_VALUE){
+				if(lastPruning == MorphologicalTreeFiltering.PRUNING_EXTINCTION_VALUE){
 					boolean selected[] = new ComputerExtinctionValueTreeOfShapes((TreeOfShape) tree).getExtinctionValueNode(lastAttributeType, prunedTree);
 					VisualizationTreeOfShape.getInstance( prunedTree, selected, null ).setVisible(true);
 				}

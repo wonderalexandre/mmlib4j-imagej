@@ -34,10 +34,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import mmlib4j.filtering.MorphologicalOperatorsBasedOnSE;
-import mmlib4j.filtering.residual.UltimateAttributeOpenClose;
-import mmlib4j.filtering.residual.UltimateAttributeOpening;
-import mmlib4j.filtering.residual.UltimateGrainFilter;
-import mmlib4j.filtering.residual.UltimateLevelingByReconstruction;
+import mmlib4j.filtering.residual.ultimateLevelings.UltimateAttributeOpenClose;
+import mmlib4j.filtering.residual.ultimateLevelings.UltimateAttributeOpening;
+import mmlib4j.filtering.residual.ultimateLevelings.UltimateGrainFilter;
+import mmlib4j.filtering.residual.ultimateLevelings.UltimateLevelingByReconstruction;
 import mmlib4j.gui.WindowImages;
 import mmlib4j.imagej.guj.EvolutionResidue;
 import mmlib4j.imagej.guj.Granulometry;
@@ -300,7 +300,7 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 			}
 			
 			else if(pruningSelected.equals("Extinction value")){
-				typePruning = MorphologicalTreeFiltering.EXTINCTION_VALUE;
+				typePruning = MorphologicalTreeFiltering.PRUNING_EXTINCTION_VALUE;
 			}
 			
 			if(comboResiduo.getSelectedItem().equals("Max{ ultimate Attribute opening and closing }")){
@@ -341,7 +341,7 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 				r.enableComputerDistribution(true);
 				r.computeUAO( getAttributeValue(), getAttributeType(), getPruningSelected(), getFilteringResidues());
 				new EvolutionResidue(mousex, mousey).patternSpectrumUAO(r.getNodeDistribuition(), tree);
-				new HistogramOfBranch(getAttributeType(), mousex, mousey).run(this.tree, getPruningSelected().getMappingSelectedNodes());
+				new HistogramOfBranch(getAttributeType(), mousex, mousey).run(this.tree, getPruningSelected());
 				
 			}
 			else if (comboResiduo.getSelectedItem().equals("Ultimate grain filter")){
@@ -351,7 +351,7 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 				r.enableComputerDistribution(true);
 				r.computeUGF( getAttributeValue(), getAttributeType(), getPruningSelected(), getFilteringResidues());
 				new EvolutionResidue(mousex, mousey).patternSpectrumUGF(r.getNodeDistribuition(), tree);
-				new HistogramOfBranch(getAttributeType(), mousex, mousey).run(this.tree, getPruningSelected().getMappingSelectedNodes());
+				new HistogramOfBranch(getAttributeType(), mousex, mousey).run(this.tree, getPruningSelected());
 			}
 			
 			analisysButton.setSelected(false);
@@ -567,30 +567,30 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 		
 	}
 	
-	public MappingStrategyOfPruning getPruningSelected(){
+	public boolean[] getPruningSelected(){
 		if(this.tree instanceof ComponentTree){
 			//ComponentTree treeCT = (ComponentTree) this.tree;
 			String pruningSelected = (String) this.comboPruningStrategy.getSelectedItem();
 			if(pruningSelected.equals("Gradual transition")){
 				System.out.println("ComponentTree - Gradual transition");
 				int gradualTrans = paramDeltaOfPruningStrategies.getValue();
-				return new PruningBasedGradualTransition(this.tree, getAttributeType(), gradualTrans);
+				return new PruningBasedGradualTransition(this.tree, getAttributeType(), gradualTrans).getMappingSelectedNodes();
 			}
 			else if(pruningSelected.equals("MSER")){
 				System.out.println("ComponentTree - MSER");
 				int delta = paramDeltaOfPruningStrategies.getValue();
-				return new PruningBasedMSER(tree, delta);
+				return new PruningBasedMSER(tree, delta).getMappingSelectedNodes();
 			}
 			else if(pruningSelected.equals("TBMR")){
 				System.out.println("ComponentTree - TBMR");
 				int tMin = 100;
 				int tMax = (int) (tree.getInputImage().getSize() * 0.80);
-				return new PruningBasedTBMR(tree, tMin, tMax);
+				return new PruningBasedTBMR(tree, tMin, tMax).getMappingSelectedNodes();
 			}
 			else if(pruningSelected.equals("Extinction value")){
 				System.out.println("ComponentTree - Extinction value");
 				int delta = paramDeltaOfPruningStrategies.getValue();
-				return new PruningBasedExtinctionValue(tree, getAttributeType(), delta);
+				return new PruningBasedExtinctionValue(tree, getAttributeType(), delta).getMappingSelectedNodes();
 			}
 		}else{
 			//TreeOfShape tree = (TreeOfShape) this.tree;
@@ -598,12 +598,12 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 			if(pruningSelected.equals("Gradual transition")){
 				System.out.println("TreeOfShape - Gradual transition");
 				int gradualTrans = paramDeltaOfPruningStrategies.getValue();
-				return new PruningBasedGradualTransition(this.tree, getAttributeType(), gradualTrans);
+				return new PruningBasedGradualTransition(this.tree, getAttributeType(), gradualTrans).getMappingSelectedNodes();
 			}
 			else if(pruningSelected.equals("MSER")){
 				System.out.println("TreeOfShape - MSER");
 				int delta = paramDeltaOfPruningStrategies.getValue();
-				return new PruningBasedMSER(tree, delta);
+				return new PruningBasedMSER(tree, delta).getMappingSelectedNodes();
 			}
 			else if(pruningSelected.equals("TBMR")){
 				System.out.println("TreeOfShape - TBMR");
@@ -613,11 +613,11 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 			else if(pruningSelected.equals("Extinction value")){
 				System.out.println("TreeOfShape - Extinction value");
 				int delta = paramDeltaOfPruningStrategies.getValue();
-				return new PruningBasedExtinctionValue(tree, getAttributeType(), delta);
+				return new PruningBasedExtinctionValue(tree, getAttributeType(), delta).getMappingSelectedNodes();
 			}
 			
 		}
-		return new PruningBasedAttribute(tree, getAttributeType());
+		return new PruningBasedAttribute(tree, getAttributeType()).getMappingSelectedNodes();
 		
 	}
 	
@@ -923,7 +923,7 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 			}
 		}
 		else if(e.getSource() == applyButtonFilter){
-			boolean selected[] = getPruningSelected().getMappingSelectedNodes();
+			boolean selected[] = getPruningSelected();
 			if(tree instanceof ComponentTree){
 				VisualizationComponentTree.getInstance( (ComponentTree) this.tree, selected, null ).setVisible(true);
 				
@@ -1134,11 +1134,11 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 		else if(comboResiduo.getSelectedItem().equals("Max{ ultimate Attribute opening and closing }")){
 			
 			this.tree = minTree;
-			MappingStrategyOfPruning mappingMin = getPruningSelected();
+			boolean mappingMin[] = getPruningSelected();
 			boolean filterMin[] = getFilteringResidues();
 			
 			this.tree = maxTree;
-			MappingStrategyOfPruning mappingMax = getPruningSelected();
+			boolean mappingMax[] = getPruningSelected();
 			boolean filterMax[] = getFilteringResidues();
 			
 			UltimateAttributeOpenClose uaoAutoDual = new UltimateAttributeOpenClose((ComponentTree)minTree, (ComponentTree)maxTree);
@@ -1286,11 +1286,11 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 			int attributeType = getAttributeType();
 			
 			tree = minTree;
-			MappingStrategyOfPruning mappingMin = getPruningSelected();
+			boolean mappingMin[] = getPruningSelected();
 			boolean filterMin[] = getFilteringResidues();
 			
 			tree = maxTree;
-			MappingStrategyOfPruning mappingMax = getPruningSelected();
+			boolean mappingMax[] = getPruningSelected();
 			boolean filterMax[] = getFilteringResidues();
 			
 			UltimateAttributeOpenClose uaoAutoDual = new UltimateAttributeOpenClose((ComponentTree)minTree, (ComponentTree)maxTree);
