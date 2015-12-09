@@ -25,12 +25,15 @@ import mmlib4j.images.GrayScaleImage;
 import mmlib4j.representation.tree.InfoPrunedTree;
 import mmlib4j.representation.tree.attribute.Attribute;
 import mmlib4j.representation.tree.componentTree.ComponentTree;
+import mmlib4j.representation.tree.componentTree.ConnectedFilteringByComponentTree;
 import mmlib4j.representation.tree.componentTree.NodeCT;
 import mmlib4j.utils.AdjacencyRelation;
 import mmlib4j.utils.ImageBuilder;
 
 import org.apache.commons.collections15.Transformer;
 import org.apache.commons.collections15.functors.ConstantTransformer;
+
+import com.sun.tools.internal.xjc.reader.gbind.ConnectedComponent;
 
 import edu.uci.ics.jung.algorithms.layout.TreeLayout;
 import edu.uci.ics.jung.graph.DelegateTree;
@@ -60,7 +63,7 @@ public class VisualizationComponentTree extends JPanel {
 	boolean isMaxtree;
 	private int id = 1;
 	
-	public VisualizationComponentTree(ComponentTree tree, boolean map1[], boolean map2[]) {
+	public VisualizationComponentTree(final ComponentTree tree, boolean map1[], boolean map2[]) {
 		super.setLayout(new BorderLayout());
 		this.compTree = tree;
 		this.isMaxtree = tree.isMaxtree();
@@ -70,7 +73,9 @@ public class VisualizationComponentTree extends JPanel {
 
 		graph.setRoot(tree.getRoot());
 		createTree(tree.getRoot());
-
+		
+		
+		
 		treeLayout = new TreeLayout<NodeCT, Integer>(graph);
 		vv = new VisualizationViewer<NodeCT, Integer>(treeLayout);
 		vv.setBackground(Color.white);
@@ -160,7 +165,17 @@ public class VisualizationComponentTree extends JPanel {
 		if(v.hasAttribute(Attribute.LEVEL)) rt.addValue("LEVEL", v.getAttributeValue(Attribute.LEVEL));
 		if(v.hasAttribute(Attribute.VARIANCE_LEVEL)) rt.addValue("VARIANCE_LEVEL", v.getAttributeValue(Attribute.VARIANCE_LEVEL));
 		if(v.hasAttribute(Attribute.LEVEL_MEAN)) rt.addValue("LEVEL_MEAN", v.getAttributeValue(Attribute.LEVEL_MEAN));
-		if(v.hasAttribute(Attribute.NUM_HOLES)) rt.addValue("NUM_HOLES", v.getAttributeValue(Attribute.NUM_HOLES));
+		
+		if(v.hasAttribute(Attribute.BIT_QUADS_PERIMETER)) rt.addValue("BIT_QUADS_PERIMETER", v.getAttributeValue(Attribute.BIT_QUADS_PERIMETER));
+		if(v.hasAttribute(Attribute.BIT_QUADS_NUMBER_EULER)) rt.addValue("BIT_QUADS_NUMBER_EULER", v.getAttributeValue(Attribute.BIT_QUADS_NUMBER_EULER));
+		if(v.hasAttribute(Attribute.BIT_QUADS_NUMBER_HOLES)) rt.addValue("BIT_QUADS_NUMBER_HOLES", v.getAttributeValue(Attribute.BIT_QUADS_NUMBER_HOLES));
+		if(v.hasAttribute(Attribute.BIT_QUADS_PERIMETER_CONTINUOUS)) rt.addValue("BIT_QUADS_PERIMETER_CONTINUOUS", v.getAttributeValue(Attribute.BIT_QUADS_PERIMETER_CONTINUOUS));
+		if(v.hasAttribute(Attribute.BIT_QUADS_CIRCULARITY)) rt.addValue("BIT_QUADS_CIRCULARITY", v.getAttributeValue(Attribute.BIT_QUADS_CIRCULARITY));
+		if(v.hasAttribute(Attribute.BIT_QUADS_AREA_AVERAGE)) rt.addValue("BIT_QUADS_AREA_AVERAGE", v.getAttributeValue(Attribute.BIT_QUADS_AREA_AVERAGE));
+		if(v.hasAttribute(Attribute.BIT_QUADS_PERIMETER_AVERAGE)) rt.addValue("BIT_QUADS_PERIMETER_AVERAGE", v.getAttributeValue(Attribute.BIT_QUADS_PERIMETER_AVERAGE));
+		if(v.hasAttribute(Attribute.BIT_QUADS_LENGTH_AVERAGE)) rt.addValue("BIT_QUADS_LENGTH_AVERAGE", v.getAttributeValue(Attribute.BIT_QUADS_LENGTH_AVERAGE));
+		if(v.hasAttribute(Attribute.BIT_QUADS_WIDTH_AVERAGE)) rt.addValue("BIT_QUADS_WIDTH_AVERAGE", v.getAttributeValue(Attribute.BIT_QUADS_WIDTH_AVERAGE));
+		
 		if(v.hasAttribute(Attribute.PERIMETER)) rt.addValue("PERIMETER", v.getAttributeValue(Attribute.PERIMETER));
 		if(v.hasAttribute(Attribute.PERIMETER_EXTERNAL)) rt.addValue("PERIMETER_EXTERNAL", v.getAttributeValue(Attribute.PERIMETER_EXTERNAL));
 		if(v.hasAttribute(Attribute.CIRCULARITY)) rt.addValue("CIRCULARITY", v.getAttributeValue(Attribute.CIRCULARITY));
@@ -312,6 +327,7 @@ public class VisualizationComponentTree extends JPanel {
 			frame = new JFrame("Component tree  - mintree");
 		Container content = frame.getContentPane();
 		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		loadAttribute(tree);
 		content.add(new VisualizationComponentTree(tree, map1, map2));
 		frame.pack();
 		return frame;
@@ -320,6 +336,7 @@ public class VisualizationComponentTree extends JPanel {
 	public static JFrame getInstance(InfoPrunedTree prunedTree, boolean map1[], boolean map2[]) {
 		JFrame frame;
 		ComponentTree tree = (ComponentTree) prunedTree.getTree();
+		loadAttribute(tree);
 		if (tree.isMaxtree())
 			frame = new JFrame("Component tree  - maxtree");
 		else
@@ -331,7 +348,18 @@ public class VisualizationComponentTree extends JPanel {
 		return frame;
 	}
 	
-	 
+	private static void loadAttribute(final ComponentTree tree){
+		new Thread(new Runnable() {
+			public void run() {
+				if(tree instanceof ConnectedFilteringByComponentTree){
+					ConnectedFilteringByComponentTree treeFilter = (ConnectedFilteringByComponentTree) tree;
+					treeFilter.computerAttributeBasedBitQuads();
+					treeFilter.computerCentralMomentAttribute();
+					treeFilter.computerAttributeBasedPerimeterExternal();
+				}
+			}
+		}).start();
+	}
 	
 	
 	public static void main(String args[]) {

@@ -247,7 +247,7 @@ public class VisualizationTreeOfShape extends JPanel {
 		if(v.hasAttribute(Attribute.LEVEL)) rt.addValue("LEVEL", v.getAttributeValue(Attribute.LEVEL));
 		if(v.hasAttribute(Attribute.VARIANCE_LEVEL)) rt.addValue("VARIANCE_LEVEL", v.getAttributeValue(Attribute.VARIANCE_LEVEL));
 		if(v.hasAttribute(Attribute.LEVEL_MEAN)) rt.addValue("LEVEL_MEAN", v.getAttributeValue(Attribute.LEVEL_MEAN));
-		if(v.hasAttribute(Attribute.NUM_HOLES)) rt.addValue("NUM_HOLES", v.getAttributeValue(Attribute.NUM_HOLES));
+		//if(v.hasAttribute(Attribute.NUM_HOLES)) rt.addValue("NUM_HOLES", v.getAttributeValue(Attribute.NUM_HOLES));
 		if(v.hasAttribute(Attribute.PERIMETER)) rt.addValue("PERIMETER", v.getAttributeValue(Attribute.PERIMETER));
 		if(v.hasAttribute(Attribute.PERIMETER_EXTERNAL)) rt.addValue("PERIMETER_EXTERNAL", v.getAttributeValue(Attribute.PERIMETER_EXTERNAL));
 		if(v.hasAttribute(Attribute.CIRCULARITY)) rt.addValue("CIRCULARITY", v.getAttributeValue(Attribute.CIRCULARITY));
