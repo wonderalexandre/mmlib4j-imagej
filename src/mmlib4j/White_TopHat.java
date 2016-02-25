@@ -20,7 +20,7 @@ import mmlib4j.utils.AdjacencyRelation;
  * Graphic User Interface by ImageJ
  */
 public class White_TopHat implements PlugInFilter {
-	 
+	
 	double raio;
 	ImagePlus imgPlus;
 	
