@@ -32,6 +32,7 @@ import mmlib4j.images.GrayScaleImage;
 import mmlib4j.images.impl.ImageFactory;
 import mmlib4j.segmentation.LiveWireIFT;
 import mmlib4j.utils.AdjacencyRelation;
+import mmlib4j.utils.ImageBuilder;
 import mmlib4j.utils.ImageUtils;
 
 /**
@@ -51,7 +52,7 @@ public class LiveWireByIFT extends PlugInFrame implements MouseListener, ActionL
 	/* Initial state falgs for operation */
 	private boolean initialPen = true;
 	
-	private JButton applyButton = new JButton("Apply");
+	private JButton applyButton = new JButton("Cut");
 	private JButton reloadButton = new JButton("Reset");
 	private JButton viewButton = new JButton("View");
 	
@@ -68,7 +69,6 @@ public class LiveWireByIFT extends PlugInFrame implements MouseListener, ActionL
 	private GrayScaleImage imgMapaPredecessores;
 	
 	private BufferedImage imgOriginal;	
-	private ColorProcessor imgProcessor;
 	private ImagePlus imgPlus;
 	private long time;
 	
@@ -91,12 +91,8 @@ public class LiveWireByIFT extends PlugInFrame implements MouseListener, ActionL
 	
 	
 	public LiveWireByIFT(ImagePlus imgPlus) {
-		super("MMorph4J - Livre wire");
+		super("MMLib4J - Livre wire");
 		this.imgPlus = imgPlus;
-		this.imgProcessor = imgPlus.getProcessor().convertToColorProcessor();
-		this.imgInput = ImageJAdapter.toGrayScaleImage( (ByteProcessor) imgPlus.getProcessor());
-		imgPlus.setProcessor(imgProcessor);
-		this.imgOriginal = imgProcessor.getBufferedImage();
 		
 		buttonPanel = new JPanel(new GridLayout(4, 0, 0, 0));
 		controlPanel.add(udefcolPanel);
@@ -142,6 +138,14 @@ public class LiveWireByIFT extends PlugInFrame implements MouseListener, ActionL
 	}
 	
 	public void initSegmentation(){
+		
+		this.imgInput = ImageJAdapter.toGrayScaleImage( (ByteProcessor) imgPlus.getProcessor()).duplicate();
+		this.imgOriginal = ImageBuilder.convertToImage(imgInput);
+		
+		Graphics2D g = (Graphics2D) imgPlus.getCanvas().getGraphics();
+		g.drawImage(imgOriginal, 0, 0, null);
+		
+		
 		imgMarcador = ImageFactory.createGrayScaleImage(32, imgInput.getWidth(), imgInput.getHeight());;
 		imgMarcador.initImage(-1);
 		
@@ -199,12 +203,17 @@ public class LiveWireByIFT extends PlugInFrame implements MouseListener, ActionL
 		}else if(e.getSource() == reloadButton){
 			penColor = comboColor.getColor();
 			indexPenColor = comboColor.getSelectedIndex();
-//			updateImage(img);
+			initSegmentation();
 		}else if(e.getSource() == viewButton){
-//			viewMarcador();
+			Graphics2D g = (Graphics2D) imgPlus.getCanvas().getGraphics();
+			imgOriginal = ImageBuilder.convertToImage(imgGradient);
+			g.drawImage(imgOriginal, 0, 0, null);
+			
 		}
 		else if(e.getSource() == applyButton){
-			//apply();
+		 
+			new ImagePlus("Cut", ImageJAdapter.toByteProcessor( LiveWireIFT.removeBackground(imgInput, imgMarcador) )).show();
+			
 		}
 	}
 	
@@ -310,7 +319,6 @@ public class LiveWireByIFT extends PlugInFrame implements MouseListener, ActionL
 			g.setColor(penColor);
 			g.setStroke(new BasicStroke(4.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 			
-			drawLine2(prevx, prevy, mousex, mousey,  indexPenColor, false);
 			drawLine(prevx, prevy, mousex, mousey,  indexPenColor, false);
 			g.drawLine(prevx, prevy, mousex, mousey);
 			
@@ -383,8 +391,8 @@ public class LiveWireByIFT extends PlugInFrame implements MouseListener, ActionL
 		for(int p: adjPincel.getAdjacencyPixels(imgInput, x, y)){
 			imgMarcador.setPixel(p, cor+1);
 			Graphics2D g = (Graphics2D) imgPlus.getCanvas().getGraphics();
-			imgProcessor.putPixel(p % imgInput.getWidth(), p / imgInput.getWidth(), comboColor.getColor(cor).getRGB());
-			//imgCurrent.setRGB(p % imgInput.getWidth(), p / imgInput.getWidth(), comboColor.getColor(cor).getRGB());
+			//imgProcessor.putPixel(p % imgInput.getWidth(), p / imgInput.getWidth(), comboColor.getColor(cor).getRGB());
+			imgOriginal.setRGB(p % imgInput.getWidth(), p / imgInput.getWidth(), comboColor.getColor(cor).getRGB());
 		}
 	}
 	
@@ -457,57 +465,7 @@ public class LiveWireByIFT extends PlugInFrame implements MouseListener, ActionL
 		}
 	}
 	
-	public  void drawLine2(int x1, int y1, int x2, int y2, int cor, boolean isMarked){
-		if(Math.abs( x2 - x1 ) > Math.abs( y2 - y1 )){
-			int a = x2 - x1;
-			int b = y2 -y1;
-			
-			int inc = 1;
-			if(b<0){
-				inc = -1;
-				b = -b;
-			}
-			int v = 2 * a + b;
-			int neg = 2 * b;
-			int pos = 2 * (b - a);
-			int x = x1;
-			int y = y1;
-			
-			while (x<= x2){
-				imgOriginal.setRGB(x, y, cor);
-				x= x + 1;
-				if(v <= 0){
-					v = v + neg;
-				}else{
-					y = y + inc;
-					v = v+ pos;
-				}
-			}
-		}else{
-			int b = x2 - x1;
-			int a = y2 - y1;
-			int inc = 1;
-			if( b < 0){
-				inc = -1;
-				b = -b;
-			}
-			int v = 2 * b - a;
-			int neg = 2 * b;
-			int pos = 2 * (b - a);
-			int x = x1;
-			int y = y1;
-			while(y <= y2){
-				imgOriginal.setRGB(x, y, cor);
-				y = y + 1;
-				if(v <= 0){
-					v = v + neg;
-				}else{
-					x = x + inc;
-					v = v + pos;
-				}
-			}
-		}
-	}
+	
 	
 	
 }
