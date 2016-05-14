@@ -172,7 +172,7 @@ public class VisualizationComponentTree extends JPanel {
 		if(v.hasAttribute(Attribute.BIT_QUADS_LENGTH_AVERAGE)) rt.addValue("BIT_QUADS_LENGTH_AVERAGE", v.getAttributeValue(Attribute.BIT_QUADS_LENGTH_AVERAGE));
 		if(v.hasAttribute(Attribute.BIT_QUADS_WIDTH_AVERAGE)) rt.addValue("BIT_QUADS_WIDTH_AVERAGE", v.getAttributeValue(Attribute.BIT_QUADS_WIDTH_AVERAGE));
 		
-		if(v.hasAttribute(Attribute.PERIMETER)) rt.addValue("PERIMETER", v.getAttributeValue(Attribute.PERIMETER));
+		//if(v.hasAttribute(Attribute.PERIMETER)) rt.addValue("PERIMETER", v.getAttributeValue(Attribute.PERIMETER));
 		if(v.hasAttribute(Attribute.PERIMETER_EXTERNAL)) rt.addValue("PERIMETER_EXTERNAL", v.getAttributeValue(Attribute.PERIMETER_EXTERNAL));
 		if(v.hasAttribute(Attribute.CIRCULARITY)) rt.addValue("CIRCULARITY", v.getAttributeValue(Attribute.CIRCULARITY));
 		if(v.hasAttribute(Attribute.COMPACTNESS)) rt.addValue("COMPACTNESS", v.getAttributeValue(Attribute.COMPACTNESS));
