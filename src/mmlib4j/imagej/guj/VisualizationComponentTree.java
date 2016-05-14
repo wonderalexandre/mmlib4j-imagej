@@ -1,7 +1,5 @@
 package mmlib4j.imagej.guj;
 
-import ij.measure.ResultsTable;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -20,20 +18,8 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import mmlib4j.gui.WindowImages;
-import mmlib4j.images.GrayScaleImage;
-import mmlib4j.representation.tree.InfoPrunedTree;
-import mmlib4j.representation.tree.attribute.Attribute;
-import mmlib4j.representation.tree.componentTree.ComponentTree;
-import mmlib4j.representation.tree.componentTree.ConnectedFilteringByComponentTree;
-import mmlib4j.representation.tree.componentTree.NodeCT;
-import mmlib4j.utils.AdjacencyRelation;
-import mmlib4j.utils.ImageBuilder;
-
 import org.apache.commons.collections15.Transformer;
 import org.apache.commons.collections15.functors.ConstantTransformer;
-
-import com.sun.tools.internal.xjc.reader.gbind.ConnectedComponent;
 
 import edu.uci.ics.jung.algorithms.layout.TreeLayout;
 import edu.uci.ics.jung.graph.DelegateTree;
@@ -45,6 +31,16 @@ import edu.uci.ics.jung.visualization.control.GraphMouseListener;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
 import edu.uci.ics.jung.visualization.control.ScalingControl;
 import edu.uci.ics.jung.visualization.decorators.EdgeShape;
+import ij.measure.ResultsTable;
+import mmlib4j.gui.WindowImages;
+import mmlib4j.images.GrayScaleImage;
+import mmlib4j.representation.tree.InfoPrunedTree;
+import mmlib4j.representation.tree.attribute.Attribute;
+import mmlib4j.representation.tree.componentTree.ComponentTree;
+import mmlib4j.representation.tree.componentTree.ConnectedFilteringByComponentTree;
+import mmlib4j.representation.tree.componentTree.NodeCT;
+import mmlib4j.utils.AdjacencyRelation;
+import mmlib4j.utils.ImageBuilder;
 
 
 /**
@@ -165,7 +161,7 @@ public class VisualizationComponentTree extends JPanel {
 		if(v.hasAttribute(Attribute.LEVEL)) rt.addValue("LEVEL", v.getAttributeValue(Attribute.LEVEL));
 		if(v.hasAttribute(Attribute.VARIANCE_LEVEL)) rt.addValue("VARIANCE_LEVEL", v.getAttributeValue(Attribute.VARIANCE_LEVEL));
 		if(v.hasAttribute(Attribute.LEVEL_MEAN)) rt.addValue("LEVEL_MEAN", v.getAttributeValue(Attribute.LEVEL_MEAN));
-		
+		 
 		if(v.hasAttribute(Attribute.BIT_QUADS_PERIMETER)) rt.addValue("BIT_QUADS_PERIMETER", v.getAttributeValue(Attribute.BIT_QUADS_PERIMETER));
 		if(v.hasAttribute(Attribute.BIT_QUADS_NUMBER_EULER)) rt.addValue("BIT_QUADS_NUMBER_EULER", v.getAttributeValue(Attribute.BIT_QUADS_NUMBER_EULER));
 		if(v.hasAttribute(Attribute.BIT_QUADS_NUMBER_HOLES)) rt.addValue("BIT_QUADS_NUMBER_HOLES", v.getAttributeValue(Attribute.BIT_QUADS_NUMBER_HOLES));
