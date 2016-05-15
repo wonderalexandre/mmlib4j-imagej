@@ -36,14 +36,14 @@ public class HistogramOfBranch {
 		this.y = y;
 	}
 	
-	public void showScoreMser(NodeCT node, boolean[] selected, Double []q) {
+	public void showScoreMser(NodeCT node, boolean[] selected, Double []scoreBranch) {
 		int contStable = 0;
 		int contMser = 0;
-		for (int i = 0; i < q.length; i++) {
-			if(q[i] != null){
+		for (int i = 0; i < scoreBranch.length; i++) {
+			if(scoreBranch[i] != null){
 				contStable++;
 			}
-			if(selected[i] && q[i] != null){
+			if(selected[i] && scoreBranch[i] != null){
 				contMser++;
 			}
 		}
@@ -55,19 +55,31 @@ public class HistogramOfBranch {
 		double scoreMser[] = new double[contMser];
 		int contScore = 0;
 		int contScoreMser = 0;
-		for (int i = 0; i < q.length; i++) {
-			if(q[i] != null){
-				indiceScore[contScore] = i;
-				score[contScore] = q[i];
+		
+		for(NodeCT nodePath: node.getPathToRoot()){
+			if(scoreBranch[nodePath.getId()] != null){
+				indiceScore[contScore] = contScore;
+				score[contScore] = scoreBranch[nodePath.getId()];
 				contScore++;
 			}
-			if(selected[i] && q[i] != null){
-				indiceMser[contScoreMser] = i;
-				scoreMser[contScoreMser] = q[i];
+			if(selected[nodePath.getId()] && scoreBranch[nodePath.getId()] != null){
+				indiceMser[contScoreMser] = contScore;
+				scoreMser[contScoreMser] = scoreBranch[nodePath.getId()];
 				contScoreMser++;
 			}
-			
 		}
+		/*for (int i = 0; i < scoreBranch.length; i++) {
+			if(scoreBranch[i] != null){
+				indiceScore[contScore] = i;
+				score[contScore] = scoreBranch[i];
+				contScore++;
+			}
+			if(selected[i] && scoreBranch[i] != null){
+				indiceMser[contScoreMser] = i;
+				scoreMser[contScoreMser] = scoreBranch[i];
+				contScoreMser++;
+			}
+		}*/
 
 		Plot pw = new Plot("Stability function for the nodes of the path (which contains selected node) from leaf to the root.", "nodes stable", "score of nodes stable", indiceScore, score);
 		double[] a = Tools.getMinMax(indiceScore);
@@ -81,8 +93,8 @@ public class HistogramOfBranch {
 		
 		pw.setColor(Color.RED);
 		pw.addPoints(indiceMser, scoreMser, Plot.CIRCLE);
-		pw.addPoints(indiceMser, scoreMser, Plot.BOX);
-		pw.addPoints(indiceMser, scoreMser, Plot.X);
+		//pw.addPoints(indiceMser, scoreMser, Plot.BOX);
+		//pw.addPoints(indiceMser, scoreMser, Plot.X);
 		
 		
 		pw.setColor(Color.BLACK);

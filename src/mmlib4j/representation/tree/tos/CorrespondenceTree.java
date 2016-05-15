@@ -96,9 +96,9 @@ public class CorrespondenceTree extends JPanel{
 		addCT(mintree);
 		
 		
-		//this.tos = new TreeOfShape(img);
+		this.tos = new TreeOfShape(img);
 		//tos.extendedTree();
-		//addToS(tos);
+		addToS(tos);
     	
     	this.maxtree = new ComponentTree(img, adj8, true);
     	//maxtree.extendedTree();
@@ -359,7 +359,7 @@ public class CorrespondenceTree extends JPanel{
 		
 		
 		CorrespondenceTree jTree = new CorrespondenceTree(imgInput);
-		//jTree.correspondence();
+		jTree.correspondence();
 		
 		JFrame frame = new JFrame("Trees");
 		Container content = frame.getContentPane();
