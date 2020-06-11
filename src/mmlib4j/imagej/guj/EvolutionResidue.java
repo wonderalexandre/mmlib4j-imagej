@@ -1,17 +1,17 @@
 package mmlib4j.imagej.guj;
 
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import ij.ImagePlus;
 import ij.ImageStack;
 import ij.gui.Plot;
 import ij.gui.PlotWindow;
 import ij.process.ByteProcessor;
 import ij.util.Tools;
-
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import mmlib4j.imagej.utils.ImageJAdapter;
+import mmlib4j.representation.tree.NodeLevelSets;
 import mmlib4j.representation.tree.componentTree.ComponentTree;
 import mmlib4j.representation.tree.componentTree.NodeCT;
 import mmlib4j.representation.tree.tos.NodeToS;
@@ -32,8 +32,8 @@ public class EvolutionResidue {
 	}
 	
 	
-	public void patternSpectrumUGF(ArrayList<NodeToS>[] dist, TreeOfShape tree){
-		NodeToS nodeSelected = tree.getSC( y * tree.getInputImage().getWidth() + x );
+	public void patternSpectrumUGF(ArrayList<NodeLevelSets>[] dist, TreeOfShape tree){
+		NodeLevelSets nodeSelected = tree.getSC( y * tree.getInputImage().getWidth() + x );
 		ImageStack stack = new ImageStack(tree.getInputImage().getWidth(), tree.getInputImage().getHeight());
 		ByteProcessor img = null;//ImageJAdapter.toByteProcessor(tree.getInputImage());
 		//stack.addSlice("primitive: 0", img);
@@ -60,7 +60,7 @@ public class EvolutionResidue {
 					py1[index] = py1[index-1];
 				
 				boolean flag = false;
-				for(NodeToS node: dist[i]){
+				for(NodeLevelSets node: dist[i]){
 					if(node.isDescendant(nodeSelected))
 						if(node.getParent() != null){
 							flag = true;
@@ -108,8 +108,8 @@ public class EvolutionResidue {
 	}
 	
 
-	public void patternSpectrumUAO(ArrayList<NodeCT>[] dist, ComponentTree tree){
-		NodeCT nodeSelected = tree.getSC( y * tree.getInputImage().getWidth() + x );
+	public void patternSpectrumUAO(ArrayList<NodeLevelSets>[] dist, ComponentTree tree){
+		NodeLevelSets nodeSelected = tree.getSC( y * tree.getInputImage().getWidth() + x );
 		ImageStack stack = new ImageStack(tree.getInputImage().getWidth(), tree.getInputImage().getHeight());
 		ByteProcessor img = null;//ImageJAdapter.toByteProcessor(tree.getInputImage());
 		//stack.addSlice("primitive: 0", img);
@@ -139,7 +139,7 @@ public class EvolutionResidue {
 					py1[index] = py1[index-1];
 				
 				boolean flag = false;
-				for(NodeCT node: dist[i]){
+				for(NodeLevelSets node: dist[i]){
 					if(node.isDescendant(nodeSelected))
 						if(node.getParent() != null){
 							flag = true;

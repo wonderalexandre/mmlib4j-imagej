@@ -144,7 +144,7 @@ public class CorrespondenceTree extends JPanel{
 					NodeCT no = (NodeCT) v;
 					if(no.isNodeMaxtree()){
 						WindowImages.show(no.createImage(), "Upper CC (Maxtree)  - level: " + no.getLevel() + " - SC: " + !no.isClone());
-						for(NodeCT nodeCor: getNodeCorrespondece(no, mintree, -1)){
+						for(NodeLevelSets nodeCor: getNodeCorrespondece(no, mintree, -1)){
 			    			graph.addEdge("Merge_"+ (cont++), no, nodeCor);
 			    		}
 					}
@@ -159,9 +159,9 @@ public class CorrespondenceTree extends JPanel{
 			    		}
 						*/
 						
-						for(NodeCT n: no.getAdjacencyNodes()){
-							WindowImages.show(n.createImage(),"Adjcentes - level: " + n.getLevel() + " - SC: " + !n.isClone());
-						}
+						//for(NodeCT n: no.getAdjacencyNodes()){
+						//	WindowImages.show(n.createImage(),"Adjcentes - level: " + n.getLevel() + " - SC: " + !n.isClone());
+						//}
 						//for(NodeCT node: no.getSubtree())
 						//	graph.removeVertex(node, false);
 						
@@ -220,7 +220,7 @@ public class CorrespondenceTree extends JPanel{
     		if(node != tree.getRoot()){
         		tree.addChild(id + nodeToS.getId(), nodeToS.getParent(), node);
         	}
-        	for(NodeToS son: nodeToS.getChildren()){
+        	for(NodeLevelSets son: nodeToS.getChildren()){
         		createTree(son, tree, id);
         	}   	
     	}else{
@@ -228,7 +228,7 @@ public class CorrespondenceTree extends JPanel{
     		if(node != tree.getRoot()){
         		tree.addChild(id+ nodeCT.getId(), nodeCT.getParent(), node);
         	}
-        	for(NodeCT son: nodeCT.getChildren()){
+        	for(NodeLevelSets son: nodeCT.getChildren()){
         		createTree(son, tree, id);
         	}
     	}
@@ -239,23 +239,23 @@ public class CorrespondenceTree extends JPanel{
     public void correspondenceMinMax(){
     	//boolean flag[] = new boolean[maxtree.getNumNode()];
     	int cont=0;
-    	for(NodeCT node: mintree.getListNodes()){
+    	for(NodeLevelSets node: mintree.getListNodes()){
     		//for(Integer pixel: node.getPixels()){
     			//if(! flag[maxtree.getSC(pixel).getId()]){
     				//flag[maxtree.getSC(pixel).getId()] = true;
     				//graph.addEdge("Merge_"+ cont++, node, maxtree.getSC(pixel));
     			//}
     		//}
-    		for(NodeCT nodeCor: getNodeCorrespondece(node, maxtree, -1)){
+    		for(NodeLevelSets nodeCor: getNodeCorrespondece(node, maxtree, -1)){
     			graph.addEdge("Merge_"+ cont++, node, nodeCor);
     		}
     	}
     }
     
-    public LinkedList<NodeCT> getNodeCorrespondece(NodeCT node, ComponentTree tree, int level){
-    	LinkedList<NodeCT> list = new LinkedList<NodeCT>();
+    public LinkedList<NodeLevelSets> getNodeCorrespondece(NodeLevelSets node, ComponentTree tree, int level){
+    	LinkedList<NodeLevelSets> list = new LinkedList<NodeLevelSets>();
     	boolean flag[] = new boolean[tree.getNumNode()];
-    	for(Integer p: node.getCanonicalPixels()){
+    	for(Integer p: node.getCompactNodePixels()){
     		if(level == -1){
     			if(! flag[tree.getSC(p).getId()]){
     				flag[tree.getSC(p).getId()] = true;
@@ -293,7 +293,7 @@ public class CorrespondenceTree extends JPanel{
     public void correspondence(){
     	boolean flag[] = new boolean[tos.getNumNode()];
     	for(int p=0; p < img.getSize(); p++){
-			if(tos.getSC(p).isNodeMaxtree){
+			if(tos.getSC(p).isNodeMaxtree()){
 				if(! flag[tos.getSC(p).getId()]){
 					flag[tos.getSC(p).getId()] = true;
 					graph.addEdge("Merge_"+ tos.getSC(p).getId(), maxtree.getSC(p), tos.getSC(p));
@@ -413,8 +413,8 @@ class NodeShapeTree implements Transformer<NodeLevelSets, Paint> {
 				else
 					return t1.transform(node);
 			}else{
-				if(node.flagPruning)
-					return t2Leaf.transform(node);
+				//if(node.flagPruning)
+				//	return t2Leaf.transform(node);
 				if(!node.isClone())
 					return t2Leaf.transform(node);
 				else

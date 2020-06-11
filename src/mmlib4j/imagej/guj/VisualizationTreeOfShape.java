@@ -1,7 +1,5 @@
 package mmlib4j.imagej.guj;
 
-import ij.measure.ResultsTable;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -12,19 +10,12 @@ import java.awt.PopupMenu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.io.File;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-
-import mmlib4j.gui.WindowImages;
-import mmlib4j.images.GrayScaleImage;
-import mmlib4j.representation.tree.InfoPrunedTree;
-import mmlib4j.representation.tree.attribute.Attribute;
-import mmlib4j.representation.tree.tos.NodeToS;
-import mmlib4j.representation.tree.tos.TreeOfShape;
-import mmlib4j.utils.ImageBuilder;
 
 import org.apache.commons.collections15.Transformer;
 import org.apache.commons.collections15.functors.ConstantTransformer;
@@ -40,6 +31,17 @@ import edu.uci.ics.jung.visualization.control.GraphMouseListener;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
 import edu.uci.ics.jung.visualization.control.ScalingControl;
 import edu.uci.ics.jung.visualization.decorators.EdgeShape;
+import ij.measure.ResultsTable;
+import mmlib4j.gui.WindowImages;
+import mmlib4j.images.GrayScaleImage;
+import mmlib4j.representation.tree.InfoTree;
+import mmlib4j.representation.tree.MorphologicalTree;
+import mmlib4j.representation.tree.NodeLevelSets;
+import mmlib4j.representation.tree.attribute.Attribute;
+import mmlib4j.representation.tree.tos.NodeToS;
+import mmlib4j.representation.tree.tos.TreeOfShape;
+import mmlib4j.utils.ImageBuilder;
+import mmlib4j.utils.Utils;
 
 /**
  * MMLib4J - Mathematical Morphology Library for Java 
@@ -147,13 +149,13 @@ public class VisualizationTreeOfShape extends JPanel {
         
     }
     
-    public VisualizationTreeOfShape(InfoPrunedTree prunedTree, boolean map1[], boolean map2[]) {
+    public VisualizationTreeOfShape(InfoTree prunedTree, boolean map1[], boolean map2[]) {
         super.setLayout(new BorderLayout());
-    	this.compTree = (TreeOfShape) prunedTree.getTree();
+    	//this.compTree = (TreeOfShape) prunedTree.
     	graph = new DelegateTree<NodeToS,Integer>();
-        
+    	this.compTree = (TreeOfShape) prunedTree.getInputTree();
         ((DelegateTree)graph).setRoot(compTree.getRoot());
-        createTree(prunedTree.getRoot());
+        createTree(compTree.getRoot());
         
         treeLayout = new TreeLayout<NodeToS,Integer>(graph);
         vv =  new VisualizationViewer<NodeToS,Integer>(treeLayout);
@@ -269,23 +271,15 @@ public class VisualizationTreeOfShape extends JPanel {
      * 
      */
     private int id=0;
-    private void createTree(NodeToS node) {
+    private void createTree(NodeLevelSets node) {
     	if(node != compTree.getRoot()){
     		((DelegateTree)graph).addChild(id++, node.getParent(), node);
     	}
-    	for(NodeToS son: node.getChildren()){
+    	for(NodeLevelSets son: node.getChildren()){
     		createTree(son);
     	}   	
     }
 
-    private void createTree(InfoPrunedTree.NodePrunedTree node) {
-    	if(node.getInfo() != compTree.getRoot()){
-    		((DelegateTree)graph).addChild(id++, node.getInfo().getParent(), node.getInfo());
-    	}
-    	for(InfoPrunedTree.NodePrunedTree son: node.getChildren()){
-    		createTree(son);
-    	}   	
-    }
 
     /**
      * a driver for this demo
@@ -303,7 +297,7 @@ public class VisualizationTreeOfShape extends JPanel {
         return frame;
     }
     
-	public static JFrame getInstance(InfoPrunedTree prunedTree) {
+	public static JFrame getInstance(InfoTree prunedTree) {
         JFrame frame = new JFrame("Tree of shape");
         Container content = frame.getContentPane();
         frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
@@ -313,7 +307,7 @@ public class VisualizationTreeOfShape extends JPanel {
     }
     
 
-	public static JFrame getInstance(InfoPrunedTree prunedTree, boolean map1[], boolean map2[]) {
+	public static JFrame getInstance(InfoTree prunedTree, boolean map1[], boolean map2[]) {
 		JFrame frame = new JFrame("Tree of shape");
 		Container content = frame.getContentPane();
 		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
@@ -387,6 +381,46 @@ class NodeShapeToS implements Transformer<NodeToS, Paint> {
 		}
 		
 		
+	}
+	
+
+	public static void main(String args[]) {
+		
+		GrayScaleImage imgInput  = ImageBuilder.openGrayImage(new File("/Users/wonderalexandre/Dropbox/imgs/imgTeste.png"));
+		int type = Attribute.CIRCULARITY;
+		double t = 0.5;
+		Utils.debug = false;
+		
+		TreeOfShape tree = new TreeOfShape(imgInput,0,0);		
+		VisualizationTreeOfShape.getInstance(tree).setVisible(true);
+		
+		TreeOfShape tree2 = new TreeOfShape(imgInput,296,63);		
+		VisualizationTreeOfShape.getInstance(tree2).setVisible(true);
+		
+		/*
+		tree.loadAttribute(type);						
+		tree.simplificationTreeByDirectRule(t, type);
+		
+		VisualizationTreeOfShape.getInstance(tree).setVisible(true);
+		
+		// Print new tree
+		ConnectedFilteringByTreeOfShape tree2 = new ConnectedFilteringByTreeOfShape(tree.reconstruction(),0,0);
+		tree2.loadAttribute(type);
+		
+		System.out.println("Nós árvore filtrada: " + tree.getNumNode() + "\tlist node size:"+ tree.getListNodes().size());
+		System.out.println("Nós árvore cópia: " + tree2.getNumNode()  + "\tlist node size:"+ tree2.getListNodes().size());				
+		
+		VisualizationTreeOfShape.getInstance(tree2).setVisible(true);
+		
+		for(int p = 0 ; p < imgInput.getSize() ; p++) {
+			NodeLevelSets node1 = tree.getSC(p);
+			NodeLevelSets node2 = tree2.getSC(p);
+			if(node1.getCompactNodePixels().size() != node2.getCompactNodePixels().size())
+				System.out.println("Erro: " + node1.getCompactNodePixels().size()+ " == " + node2.getCompactNodePixels().size());
+		}	
+		
+		System.out.println("Images iguais? " + ImageAlgebra.equals(tree.reconstruction(), tree2.reconstruction()));
+			*/
 	}
 	
 	

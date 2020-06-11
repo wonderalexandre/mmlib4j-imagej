@@ -1,21 +1,19 @@
 package mmlib4j.imagej.guj;
-import ij.gui.Plot;
-import ij.util.Tools;
-
 import java.awt.Color;
 import java.util.ArrayList;
 
+import ij.gui.Plot;
+import ij.util.Tools;
+import mmlib4j.imagej.plugins.residual.UltimateLevelings;
 import mmlib4j.representation.tree.InfoPrunedTree;
-import mmlib4j.representation.tree.MorphologicalTreeFiltering;
+import mmlib4j.representation.tree.MorphologicalTree;
+import mmlib4j.representation.tree.NodeLevelSets;
 import mmlib4j.representation.tree.attribute.Attribute;
-import mmlib4j.representation.tree.attribute.ComputerExtinctionValueComponentTree;
-import mmlib4j.representation.tree.attribute.ComputerExtinctionValueTreeOfShapes;
-import mmlib4j.representation.tree.attribute.ComputerMserComponentTree;
-import mmlib4j.representation.tree.attribute.ComputerMserTreeOfShapes;
+import mmlib4j.representation.tree.attribute.ComputerMSER;
 import mmlib4j.representation.tree.componentTree.ComponentTree;
-import mmlib4j.representation.tree.componentTree.NodeCT;
+import mmlib4j.representation.tree.pruningStrategy.PruningBasedExtinctionValue;
 import mmlib4j.representation.tree.pruningStrategy.PruningBasedGradualTransition;
-import mmlib4j.representation.tree.tos.NodeToS;
+import mmlib4j.representation.tree.pruningStrategy.PruningBasedMSER;
 import mmlib4j.representation.tree.tos.TreeOfShape;
 
 /**
@@ -26,6 +24,8 @@ import mmlib4j.representation.tree.tos.TreeOfShape;
  */
 public class HistogramOfBranch {
 
+
+	
 	private int indexAttr;
 	int x;
 	int y;
@@ -36,7 +36,7 @@ public class HistogramOfBranch {
 		this.y = y;
 	}
 	
-	public void showScoreMser(NodeCT node, boolean[] selected, Double []scoreBranch) {
+	public void showScoreMser(NodeLevelSets node, boolean[] selected, Double []scoreBranch) {
 		int contStable = 0;
 		int contMser = 0;
 		for (int i = 0; i < scoreBranch.length; i++) {
@@ -56,7 +56,7 @@ public class HistogramOfBranch {
 		int contScore = 0;
 		int contScoreMser = 0;
 		
-		for(NodeCT nodePath: node.getPathToRoot()){
+		for(NodeLevelSets nodePath: node.getPathToRoot()){
 			if(scoreBranch[nodePath.getId()] != null){
 				indiceScore[contScore] = contScore;
 				score[contScore] = scoreBranch[nodePath.getId()];
@@ -146,17 +146,18 @@ public class HistogramOfBranch {
 		ArrayList<Float> listPxSelected = null;
 		ArrayList<Float> listPySelected = null;
 		
-		MorphologicalTreeFiltering treeIn = prunedTree.getTree();
+		MorphologicalTree treeIn = prunedTree.getInputTree();
 		if(treeIn instanceof ComponentTree){	
 			ComponentTree tree = (ComponentTree) treeIn;
 			
-			if (typePruning == MorphologicalTreeFiltering.PRUNING_EXTINCTION_VALUE){
-				ComputerExtinctionValueComponentTree ev = new ComputerExtinctionValueComponentTree(tree);
-				boolean selected[] = ev.getExtinctionValueNodeCT(indexAttr, prunedTree);
-				boolean selected2[] = new boolean[tree.getNumNode()];
-				ArrayList<NodeCT> listEVPath = new ArrayList<NodeCT>();
+			if (typePruning == UltimateLevelings.PRUNING_EXTINCTION_VALUE){
+				PruningBasedExtinctionValue ev = new PruningBasedExtinctionValue(tree, prunedTree.getAttributeType());
 				
-				NodeCT node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
+				boolean selected[] = null;//ev.getExtinctionValue(indexAttr, prunedTree);
+				boolean selected2[] = new boolean[tree.getNumNode()];
+				ArrayList<NodeLevelSets> listEVPath = new ArrayList<NodeLevelSets>();
+				
+				NodeLevelSets node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
 				while(prunedTree.wasPruned(node)){
 					node = node.getParent();
 				}
@@ -176,18 +177,18 @@ public class HistogramOfBranch {
 				
 				listPxSelected = new ArrayList<Float>();
 				listPySelected = new ArrayList<Float>();
-				for(NodeCT n: listEVPath){
+				for(NodeLevelSets n: listEVPath){
 					listPxSelected.add(new Float(n.getLevel()));
 					listPySelected.add(getAttribute(n));
 				}
 				//VisualizationComponentTree.getInstance(prunedTree, selected, selected2).setVisible(true);
-			}else if(typePruning == MorphologicalTreeFiltering.PRUNING_MSER){
-				ComputerMserComponentTree mser = new ComputerMserComponentTree(tree);
-				boolean selected[] = mser.getMappingNodesByMSER(delta, prunedTree); 
+			}else if(typePruning == UltimateLevelings.PRUNING_MSER){
+				PruningBasedMSER mser = new PruningBasedMSER(tree, Attribute.AREA, delta);
+				boolean selected[] = mser.getMappingSelectedNodesInPrunedTree(prunedTree); 
 				boolean selected2[] = new boolean[tree.getNumNode()];
-				ArrayList<NodeCT> listEVPath = new ArrayList<NodeCT>();
+				ArrayList<NodeLevelSets> listEVPath = new ArrayList<NodeLevelSets>();
 				
-				NodeCT node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
+				NodeLevelSets node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
 				while(prunedTree.wasPruned(node)){
 					node = node.getParent();
 				}
@@ -210,19 +211,19 @@ public class HistogramOfBranch {
 				
 				listPxSelected = new ArrayList<Float>();
 				listPySelected = new ArrayList<Float>();
-				for(NodeCT n: listEVPath){
+				for(NodeLevelSets n: listEVPath){
 					listPxSelected.add(new Float(n.getLevel()));
 					listPySelected.add(getAttribute(n));
 				}
 				//VisualizationComponentTree.getInstance(prunedTree, selected, selected2).setVisible(true);
 			}
-			else if(typePruning == MorphologicalTreeFiltering.PRUNING_GRADUAL_TRANSITION){
+			else if(typePruning == UltimateLevelings.PRUNING_GRADUAL_TRANSITION){
 				PruningBasedGradualTransition gt = new PruningBasedGradualTransition(treeIn, prunedTree.getAttributeType(), delta);
-				boolean selected[] = gt.getMappingSelectedNodes(prunedTree); 
+				boolean selected[] = gt.getMappingSelectedNodesInPrunedTree(prunedTree); 
 				boolean selected2[] = new boolean[tree.getNumNode()];
-				ArrayList<NodeCT> listEVPath = new ArrayList<NodeCT>();
+				ArrayList<NodeLevelSets> listEVPath = new ArrayList<NodeLevelSets>();
 				
-				NodeCT node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
+				NodeLevelSets node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
 				while(prunedTree.wasPruned(node)){
 					node = node.getParent();
 				}
@@ -243,14 +244,14 @@ public class HistogramOfBranch {
 				
 				listPxSelected = new ArrayList<Float>();
 				listPySelected = new ArrayList<Float>();
-				for(NodeCT n: listEVPath){
+				for(NodeLevelSets n: listEVPath){
 					listPxSelected.add(new Float(n.getLevel()));
 					listPySelected.add(getAttribute(n));
 				}
 			}
 			else{
 				
-				NodeCT node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
+				NodeLevelSets node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
 				while(prunedTree.wasPruned(node)){
 					node = node.getParent();
 				}
@@ -267,13 +268,13 @@ public class HistogramOfBranch {
 		}else{
 			TreeOfShape tree = (TreeOfShape) treeIn;
 			
-			if (typePruning == MorphologicalTreeFiltering.PRUNING_EXTINCTION_VALUE){
-				ComputerExtinctionValueTreeOfShapes ev = new ComputerExtinctionValueTreeOfShapes(tree);
-				boolean selected[] = ev.getExtinctionValueNode(indexAttr, prunedTree);
+			if (typePruning == UltimateLevelings.PRUNING_EXTINCTION_VALUE){
+				PruningBasedExtinctionValue ev = new PruningBasedExtinctionValue(tree, prunedTree.getAttributeType());
+				boolean selected[] = null;//ev.getExtinctionValue(indexAttr, prunedTree);
 				boolean selected2[] = new boolean[tree.getNumNode()];
-				ArrayList<NodeToS> listEVPath = new ArrayList<NodeToS>();
+				ArrayList<NodeLevelSets> listEVPath = new ArrayList<NodeLevelSets>();
 				
-				NodeToS node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
+				NodeLevelSets node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
 				while(prunedTree.wasPruned(node)){
 					node = node.getParent();
 				}
@@ -293,20 +294,20 @@ public class HistogramOfBranch {
 				
 				listPxSelected = new ArrayList<Float>();
 				listPySelected = new ArrayList<Float>();
-				for(NodeToS n: listEVPath){
+				for(NodeLevelSets n: listEVPath){
 					listPxSelected.add(new Float(n.getLevel()));
 					listPySelected.add(getAttribute(n));
 				}
 				
 				
 			}
-			else if(typePruning == MorphologicalTreeFiltering.PRUNING_MSER){
-				ComputerMserTreeOfShapes mser = new ComputerMserTreeOfShapes(tree);
-				boolean selected[] = mser.getMappingNodesByMSER(delta, prunedTree); 
+			else if(typePruning == UltimateLevelings.PRUNING_MSER){
+				PruningBasedMSER mser = new PruningBasedMSER(tree, Attribute.AREA, delta);
+				boolean selected[] = mser.getMappingSelectedNodesInPrunedTree(prunedTree); 
 				boolean selected2[] = new boolean[tree.getNumNode()];
-				ArrayList<NodeToS> listEVPath = new ArrayList<NodeToS>();
+				ArrayList<NodeLevelSets> listEVPath = new ArrayList<NodeLevelSets>();
 				
-				NodeToS node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
+				NodeLevelSets node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
 				while(prunedTree.wasPruned(node)){
 					node = node.getParent();
 				}
@@ -326,14 +327,14 @@ public class HistogramOfBranch {
 				
 				listPxSelected = new ArrayList<Float>();
 				listPySelected = new ArrayList<Float>();
-				for(NodeToS n: listEVPath){
+				for(NodeLevelSets n: listEVPath){
 					listPxSelected.add(new Float(n.getLevel()));
 					listPySelected.add(getAttribute(n));
 				}
 			}
 			else{
 				
-				NodeToS node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
+				NodeLevelSets node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
 				
 				while(prunedTree.wasPruned(node)){
 					node = node.getParent();
@@ -386,7 +387,7 @@ public class HistogramOfBranch {
 	}
 	
 
-	public void run(MorphologicalTreeFiltering treeIn, int typePruning, int delta) {
+	public void run(MorphologicalTree treeIn, int typePruning, int delta) {
 		ArrayList<Float> listPx = new ArrayList<Float>();
 		ArrayList<Float> listPy = new ArrayList<Float>();
 
@@ -397,13 +398,13 @@ public class HistogramOfBranch {
 		if(treeIn instanceof ComponentTree){	
 			ComponentTree tree = (ComponentTree) treeIn;
 			
-			if (typePruning == MorphologicalTreeFiltering.PRUNING_EXTINCTION_VALUE){
-				ComputerExtinctionValueComponentTree ev = new ComputerExtinctionValueComponentTree(tree);
-				boolean selected[] = ev.getExtinctionValueNodeCT(indexAttr);
+			if (typePruning == UltimateLevelings.PRUNING_EXTINCTION_VALUE){
+				PruningBasedExtinctionValue ev = new PruningBasedExtinctionValue(tree, Attribute.AREA);
+				boolean selected[] =null;// ev.getExtinctionValue(indexAttr);
 				boolean selected2[] = new boolean[tree.getNumNode()];
-				ArrayList<NodeCT> listEVPath = new ArrayList<NodeCT>();
+				ArrayList<NodeLevelSets> listEVPath = new ArrayList<NodeLevelSets>();
 				
-				NodeCT node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
+				NodeLevelSets node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
 				selected2[node.hashCode()] = true;
 				listPx.add(new Float(node.getLevel()));
 				listPy.add(getAttribute(node));
@@ -423,18 +424,18 @@ public class HistogramOfBranch {
 				
 				listPxSelected = new ArrayList<Float>();
 				listPySelected = new ArrayList<Float>();
-				for(NodeCT n: listEVPath){
+				for(NodeLevelSets n: listEVPath){
 					listPxSelected.add(new Float(n.getLevel()));
 					listPySelected.add(getAttribute(n));
 				}
 				//VisualizationComponentTree.getInstance(prunedTree, selected, selected2).setVisible(true);
-			}else if(typePruning == MorphologicalTreeFiltering.PRUNING_MSER){
-				ComputerMserComponentTree mser = new ComputerMserComponentTree(tree);
-				boolean selected[] = mser.getMappingNodesByMSER(delta); 
+			}else if(typePruning == UltimateLevelings.PRUNING_MSER){
+				PruningBasedMSER mser = new PruningBasedMSER(tree, Attribute.AREA, delta);
+				boolean selected[] = mser.getMappingSelectedNodes(); 
 				boolean selected2[] = new boolean[tree.getNumNode()];
-				ArrayList<NodeCT> listEVPath = new ArrayList<NodeCT>();
+				ArrayList<NodeLevelSets> listEVPath = new ArrayList<NodeLevelSets>();
 				
-				NodeCT node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
+				NodeLevelSets node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
 				//showScoreMser(mser.getScore());
 				showScoreMser(node, selected, mser.getScoreOfBranch(node));
 				
@@ -457,19 +458,19 @@ public class HistogramOfBranch {
 				
 				listPxSelected = new ArrayList<Float>();
 				listPySelected = new ArrayList<Float>();
-				for(NodeCT n: listEVPath){
+				for(NodeLevelSets n: listEVPath){
 					listPxSelected.add(new Float(n.getLevel()));
 					listPySelected.add(getAttribute(n));
 				}
 				//VisualizationComponentTree.getInstance(prunedTree, selected, selected2).setVisible(true);
 			}
-			else if(typePruning == MorphologicalTreeFiltering.PRUNING_GRADUAL_TRANSITION){
+			else if(typePruning == UltimateLevelings.PRUNING_GRADUAL_TRANSITION){
 				PruningBasedGradualTransition gt = new PruningBasedGradualTransition(treeIn, indexAttr, delta);
 				boolean selected[] = gt.getMappingSelectedNodes(); 
 				boolean selected2[] = new boolean[tree.getNumNode()];
-				ArrayList<NodeCT> listEVPath = new ArrayList<NodeCT>();
+				ArrayList<NodeLevelSets> listEVPath = new ArrayList<NodeLevelSets>();
 				
-				NodeCT node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
+				NodeLevelSets node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
 				
 				selected2[node.hashCode()] = true;
 				listPx.add(new Float(node.getLevel()));
@@ -490,14 +491,14 @@ public class HistogramOfBranch {
 				
 				listPxSelected = new ArrayList<Float>();
 				listPySelected = new ArrayList<Float>();
-				for(NodeCT n: listEVPath){
+				for(NodeLevelSets n: listEVPath){
 					listPxSelected.add(new Float(n.getLevel()));
 					listPySelected.add(getAttribute(n));
 				}
 			}
 			else{
 				
-				NodeCT node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
+				NodeLevelSets node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
 				listPx.add(new Float(node.getLevel()));
 				listPy.add(getAttribute(node));
 				while (node.getParent() != null) {
@@ -515,13 +516,13 @@ public class HistogramOfBranch {
 		}else{
 			TreeOfShape tree = (TreeOfShape) treeIn;
 			
-			if (typePruning == MorphologicalTreeFiltering.PRUNING_EXTINCTION_VALUE){
-				ComputerExtinctionValueTreeOfShapes ev = new ComputerExtinctionValueTreeOfShapes(tree);
-				boolean selected[] = ev.getExtinctionValueNode(indexAttr, delta);
+			if (typePruning == UltimateLevelings.PRUNING_EXTINCTION_VALUE){
+				PruningBasedExtinctionValue ev = new PruningBasedExtinctionValue(tree, Attribute.AREA);
+				boolean selected[] = null;//ev.getExtinctionValue(indexAttr, delta);
 				boolean selected2[] = new boolean[tree.getNumNode()];
-				ArrayList<NodeToS> listEVPath = new ArrayList<NodeToS>();
+				ArrayList<NodeLevelSets> listEVPath = new ArrayList<NodeLevelSets>();
 				
-				NodeToS node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
+				NodeLevelSets node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
 				selected2[node.hashCode()] = true;
 				listPx.add(new Float(node.getLevel()));
 				listPy.add(getAttribute(node));
@@ -542,20 +543,20 @@ public class HistogramOfBranch {
 				
 				listPxSelected = new ArrayList<Float>();
 				listPySelected = new ArrayList<Float>();
-				for(NodeToS n: listEVPath){
+				for(NodeLevelSets n: listEVPath){
 					listPxSelected.add(new Float(n.getLevel()));
 					listPySelected.add(getAttribute(n));
 				}
 				
 				
 			}
-			else if(typePruning == MorphologicalTreeFiltering.PRUNING_MSER){
-				ComputerMserTreeOfShapes mser = new ComputerMserTreeOfShapes(tree);
-				boolean selected[] = mser.getMappingNodesByMSER(delta); 
+			else if(typePruning == UltimateLevelings.PRUNING_MSER){
+				PruningBasedMSER mser = new PruningBasedMSER(tree, Attribute.AREA, delta);
+				boolean selected[] = mser.getMappingSelectedNodes(); 
 				boolean selected2[] = new boolean[tree.getNumNode()];
-				ArrayList<NodeToS> listEVPath = new ArrayList<NodeToS>();
+				ArrayList<NodeLevelSets> listEVPath = new ArrayList<NodeLevelSets>();
 				
-				NodeToS node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
+				NodeLevelSets node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
 				selected2[node.hashCode()] = true;
 				listPx.add(new Float(node.getLevel()));
 				listPy.add(getAttribute(node));
@@ -576,14 +577,14 @@ public class HistogramOfBranch {
 				
 				listPxSelected = new ArrayList<Float>();
 				listPySelected = new ArrayList<Float>();
-				for(NodeToS n: listEVPath){
+				for(NodeLevelSets n: listEVPath){
 					listPxSelected.add(new Float(n.getLevel()));
 					listPySelected.add(getAttribute(n));
 				}
 			}
 			else{
 				
-				NodeToS node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
+				NodeLevelSets node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
 				listPx.add(new Float(node.getLevel()));
 				listPy.add(getAttribute(node));
 				while (node.getParent() != null) {
@@ -634,7 +635,7 @@ public class HistogramOfBranch {
 	}
 	
 
-	public void run(MorphologicalTreeFiltering treeIn, boolean selected[]) {
+	public void run(MorphologicalTree treeIn, boolean selected[]) {
 		ArrayList<Float> listPx = new ArrayList<Float>();
 		ArrayList<Float> listPy = new ArrayList<Float>();
 
@@ -645,9 +646,9 @@ public class HistogramOfBranch {
 		if(treeIn instanceof ComponentTree){	
 			ComponentTree tree = (ComponentTree) treeIn;
 			boolean selected2[] = new boolean[tree.getNumNode()];
-			ArrayList<NodeCT> listEVPath = new ArrayList<NodeCT>();
+			ArrayList<NodeLevelSets> listEVPath = new ArrayList<NodeLevelSets>();
 				
-			NodeCT node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
+			NodeLevelSets node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
 			selected2[node.hashCode()] = true;
 			listPx.add(new Float(node.getLevel()));
 			listPy.add(getAttribute(node));
@@ -667,7 +668,7 @@ public class HistogramOfBranch {
 				
 			listPxSelected = new ArrayList<Float>();
 			listPySelected = new ArrayList<Float>();
-			for(NodeCT n: listEVPath){
+			for(NodeLevelSets n: listEVPath){
 				listPxSelected.add(new Float(n.getLevel()));
 				listPySelected.add(getAttribute(n));
 			}
@@ -675,9 +676,9 @@ public class HistogramOfBranch {
 		}else{
 			TreeOfShape tree = (TreeOfShape) treeIn;
 			boolean selected2[] = new boolean[tree.getNumNode()];
-			ArrayList<NodeToS> listEVPath = new ArrayList<NodeToS>();
+			ArrayList<NodeLevelSets> listEVPath = new ArrayList<NodeLevelSets>();
 				
-			NodeToS node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
+			NodeLevelSets node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
 			selected2[node.hashCode()] = true;
 			listPx.add(new Float(node.getLevel()));
 			listPy.add(getAttribute(node));
@@ -698,7 +699,7 @@ public class HistogramOfBranch {
 				
 			listPxSelected = new ArrayList<Float>();
 			listPySelected = new ArrayList<Float>();
-			for(NodeToS n: listEVPath){
+			for(NodeLevelSets n: listEVPath){
 				listPxSelected.add(new Float(n.getLevel()));
 				listPySelected.add(getAttribute(n));
 			}
@@ -742,7 +743,7 @@ public class HistogramOfBranch {
 	}
 	
 
-	public void runPrimitivesFamily(MorphologicalTreeFiltering treeIn, int typePruning, int delta) {
+	public void runPrimitivesFamily(MorphologicalTree treeIn, int typePruning, int delta) {
 		ArrayList<Float> listPx = new ArrayList<Float>();
 		ArrayList<Float> listPy = new ArrayList<Float>();
 
@@ -753,14 +754,14 @@ public class HistogramOfBranch {
 		if(treeIn instanceof ComponentTree){	
 			ComponentTree tree = (ComponentTree) treeIn;
 			
-			if (typePruning == MorphologicalTreeFiltering.PRUNING_EXTINCTION_VALUE){
-				ComputerExtinctionValueComponentTree ev = new ComputerExtinctionValueComponentTree(tree);
-				boolean selected[] = ev.getExtinctionValueNodeCT(indexAttr);
+			if (typePruning == UltimateLevelings.PRUNING_EXTINCTION_VALUE){
+				PruningBasedExtinctionValue ev = new PruningBasedExtinctionValue(tree, Attribute.AREA);
+				boolean selected[] = null;//ev.getExtinctionValueNodeCT(indexAttr);
 				boolean selected2[] = new boolean[tree.getNumNode()];
 				
-				ArrayList<NodeCT> listEVPath = new ArrayList<NodeCT>();
+				ArrayList<NodeLevelSets> listEVPath = new ArrayList<NodeLevelSets>();
 				
-				NodeCT node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
+				NodeLevelSets node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
 				selected2[node.hashCode()] = true;
 				listPx.add(new Float(node.getLevel()));
 				float contNodes[] = new float[tree.getNumNode()];
@@ -784,18 +785,18 @@ public class HistogramOfBranch {
 				
 				listPxSelected = new ArrayList<Float>();
 				listPySelected = new ArrayList<Float>();
-				for(NodeCT n: listEVPath){
+				for(NodeLevelSets n: listEVPath){
 					listPxSelected.add(new Float(n.getLevel()));
 					listPySelected.add(contNodes[n.getId()]);
 				}
 				//VisualizationComponentTree.getInstance(prunedTree, selected, selected2).setVisible(true);
-			}else if(typePruning == MorphologicalTreeFiltering.PRUNING_MSER){
-				ComputerMserComponentTree mser = new ComputerMserComponentTree(tree);
-				boolean selected[] = mser.getMappingNodesByMSER(delta); 
+			}else if(typePruning == UltimateLevelings.PRUNING_MSER){
+				PruningBasedMSER mser = new PruningBasedMSER(tree, Attribute.AREA, delta);
+				boolean selected[] = mser.getMappingSelectedNodes(); 
 				boolean selected2[] = new boolean[tree.getNumNode()];
-				ArrayList<NodeCT> listEVPath = new ArrayList<NodeCT>();
+				ArrayList<NodeLevelSets> listEVPath = new ArrayList<NodeLevelSets>();
 				
-				NodeCT node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
+				NodeLevelSets node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
 				//showScoreMser(mser.getScore());
 				showScoreMser(node, selected, mser.getScoreOfBranch(node));
 				
@@ -823,19 +824,19 @@ public class HistogramOfBranch {
 				
 				listPxSelected = new ArrayList<Float>();
 				listPySelected = new ArrayList<Float>();
-				for(NodeCT n: listEVPath){
+				for(NodeLevelSets n: listEVPath){
 					listPxSelected.add(new Float(n.getLevel()));
 					listPySelected.add(contNodes[n.getId()]);
 				}
 				//VisualizationComponentTree.getInstance(prunedTree, selected, selected2).setVisible(true);
 			}
-			else if(typePruning == MorphologicalTreeFiltering.PRUNING_GRADUAL_TRANSITION){
+			else if(typePruning == UltimateLevelings.PRUNING_GRADUAL_TRANSITION){
 				PruningBasedGradualTransition gt = new PruningBasedGradualTransition(treeIn, indexAttr, delta);
 				boolean selected[] = gt.getMappingSelectedNodes(); 
 				boolean selected2[] = new boolean[tree.getNumNode()];
-				ArrayList<NodeCT> listEVPath = new ArrayList<NodeCT>();
+				ArrayList<NodeLevelSets> listEVPath = new ArrayList<NodeLevelSets>();
 				
-				NodeCT node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
+				NodeLevelSets node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
 				
 				float contNodes[] = new float[tree.getNumNode()];
 				int cont = 0;
@@ -861,14 +862,14 @@ public class HistogramOfBranch {
 				
 				listPxSelected = new ArrayList<Float>();
 				listPySelected = new ArrayList<Float>();
-				for(NodeCT n: listEVPath){
+				for(NodeLevelSets n: listEVPath){
 					listPxSelected.add(new Float(n.getLevel()));
 					listPySelected.add(contNodes[n.getId()]);
 				}
 			}
 			else{
 				
-				NodeCT node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
+				NodeLevelSets node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
 				
 				float contNodes[] = new float[tree.getNumNode()];
 				int cont = 0;
@@ -892,13 +893,13 @@ public class HistogramOfBranch {
 		}else{
 			TreeOfShape tree = (TreeOfShape) treeIn;
 			
-			if (typePruning == MorphologicalTreeFiltering.PRUNING_EXTINCTION_VALUE){
-				ComputerExtinctionValueTreeOfShapes ev = new ComputerExtinctionValueTreeOfShapes(tree);
-				boolean selected[] = ev.getExtinctionValueNode(indexAttr, delta);
+			if (typePruning == UltimateLevelings.PRUNING_EXTINCTION_VALUE){
+				PruningBasedExtinctionValue ev = new PruningBasedExtinctionValue(tree, Attribute.AREA);
+				boolean selected[] = null;//ev.getExtinctionValueNode(indexAttr, delta);
 				boolean selected2[] = new boolean[tree.getNumNode()];
-				ArrayList<NodeToS> listEVPath = new ArrayList<NodeToS>();
+				ArrayList<NodeLevelSets> listEVPath = new ArrayList<NodeLevelSets>();
 				
-				NodeToS node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
+				NodeLevelSets node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
 				selected2[node.hashCode()] = true;
 				
 				float contNodes[] = new float[tree.getNumNode()];
@@ -925,20 +926,20 @@ public class HistogramOfBranch {
 				
 				listPxSelected = new ArrayList<Float>();
 				listPySelected = new ArrayList<Float>();
-				for(NodeToS n: listEVPath){
+				for(NodeLevelSets n: listEVPath){
 					listPxSelected.add(new Float(n.getLevel()));
 					listPySelected.add(contNodes[n.getId()]);
 				}
 				
 				
 			}
-			else if(typePruning == MorphologicalTreeFiltering.PRUNING_MSER){
-				ComputerMserTreeOfShapes mser = new ComputerMserTreeOfShapes(tree);
-				boolean selected[] = mser.getMappingNodesByMSER(delta); 
+			else if(typePruning == UltimateLevelings.PRUNING_MSER){
+				PruningBasedMSER mser = new PruningBasedMSER(tree, Attribute.AREA, delta);
+				boolean selected[] = mser.getMappingSelectedNodes(); 
 				boolean selected2[] = new boolean[tree.getNumNode()];
-				ArrayList<NodeToS> listEVPath = new ArrayList<NodeToS>();
+				ArrayList<NodeLevelSets> listEVPath = new ArrayList<NodeLevelSets>();
 				
-				NodeToS node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
+				NodeLevelSets node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
 				selected2[node.hashCode()] = true;
 				
 				float contNodes[] = new float[tree.getNumNode()];
@@ -965,14 +966,14 @@ public class HistogramOfBranch {
 				
 				listPxSelected = new ArrayList<Float>();
 				listPySelected = new ArrayList<Float>();
-				for(NodeToS n: listEVPath){
+				for(NodeLevelSets n: listEVPath){
 					listPxSelected.add(new Float(n.getLevel()));
 					listPySelected.add(contNodes[n.getId()]);
 				}
 			}
 			else{
 				
-				NodeToS node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
+				NodeLevelSets node = tree.getSC(y * treeIn.getInputImage().getWidth() + x);
 				
 				float contNodes[] = new float[tree.getNumNode()];
 				int cont = 0;
@@ -1029,37 +1030,17 @@ public class HistogramOfBranch {
 	}
 	
 	
-	public boolean isFound(ArrayList<NodeCT> list, NodeCT node){
-		for(NodeCT n: list){
+	public boolean isFound(ArrayList<NodeLevelSets> list, NodeLevelSets node){
+		for(NodeLevelSets n: list){
 			if(node.getId() == n.getId())
 				return true;
 		}
 		return false;
 	}
 
-	public float getAttribute(NodeCT node){
-		if(indexAttr == Attribute.AREA)
-			return node.getArea();
-		else if(indexAttr == Attribute.VOLUME)
-			return (float)node.getAttributeValue(Attribute.VOLUME);
-		else if(indexAttr == Attribute.HEIGHT)
-			return (float)node.getAttributeValue(Attribute.HEIGHT);
-		else if(indexAttr == Attribute.WIDTH)
-			return (float)node.getAttributeValue(Attribute.WIDTH);
-		else if(indexAttr == Attribute.ALTITUDE)
-			return (float)node.getAttributeValue(Attribute.ALTITUDE);
-		return -1;
+	public float getAttribute(NodeLevelSets node){
+		return (float)node.getAttributeValue(indexAttr);
 	}
 	
 
-	public float getAttribute(NodeToS node){
-		if(indexAttr == 0)
-			return node.getArea();
-		else if(indexAttr == 1)
-			return (int) node.getAttributeValue(Attribute.VOLUME);
-		else if(indexAttr == 2)
-			return (int) node.getAttributeValue(Attribute.HEIGHT);
-		else
-			return (int) node.getAttributeValue(Attribute.WIDTH);
-	}
 }

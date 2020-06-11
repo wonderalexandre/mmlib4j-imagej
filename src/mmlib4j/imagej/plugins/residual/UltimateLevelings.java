@@ -1,15 +1,5 @@
 package mmlib4j.imagej.plugins.residual;
 
-import ij.IJ;
-import ij.ImageListener;
-import ij.ImagePlus;
-import ij.WindowManager;
-import ij.gui.GUI;
-import ij.gui.GenericDialog;
-import ij.gui.MessageDialog;
-import ij.plugin.frame.PlugInFrame;
-import ij.process.ByteProcessor;
-
 import java.awt.Cursor;
 import java.awt.GridLayout;
 import java.awt.Panel;
@@ -33,6 +23,15 @@ import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import ij.IJ;
+import ij.ImageListener;
+import ij.ImagePlus;
+import ij.WindowManager;
+import ij.gui.GUI;
+import ij.gui.GenericDialog;
+import ij.gui.MessageDialog;
+import ij.plugin.frame.PlugInFrame;
+import ij.process.ByteProcessor;
 import mmlib4j.filtering.MorphologicalOperatorsBasedOnSE;
 import mmlib4j.filtering.residual.ultimateLevelings.UltimateAttributeOpenClose;
 import mmlib4j.filtering.residual.ultimateLevelings.UltimateAttributeOpening;
@@ -46,11 +45,10 @@ import mmlib4j.imagej.guj.VisualizationComponentTree;
 import mmlib4j.imagej.guj.VisualizationTreeOfShape;
 import mmlib4j.imagej.utils.ImageJAdapter;
 import mmlib4j.images.GrayScaleImage;
-import mmlib4j.representation.tree.MorphologicalTreeFiltering;
+import mmlib4j.representation.tree.MorphologicalTree;
 import mmlib4j.representation.tree.attribute.Attribute;
 import mmlib4j.representation.tree.componentTree.ComponentTree;
-import mmlib4j.representation.tree.componentTree.ConnectedFilteringByComponentTree;
-import mmlib4j.representation.tree.pruningStrategy.MappingStrategyOfPruning;
+import mmlib4j.representation.tree.pruningStrategy.FilteringBasedOnPruning;
 import mmlib4j.representation.tree.pruningStrategy.PruningBasedAttribute;
 import mmlib4j.representation.tree.pruningStrategy.PruningBasedCircularity;
 import mmlib4j.representation.tree.pruningStrategy.PruningBasedElongation;
@@ -59,7 +57,6 @@ import mmlib4j.representation.tree.pruningStrategy.PruningBasedGradualTransition
 import mmlib4j.representation.tree.pruningStrategy.PruningBasedMSER;
 import mmlib4j.representation.tree.pruningStrategy.PruningBasedTBMR;
 import mmlib4j.representation.tree.pruningStrategy.PruningBasedTextLocation;
-import mmlib4j.representation.tree.tos.ConnectedFilteringByTreeOfShape;
 import mmlib4j.representation.tree.tos.TreeOfShape;
 import mmlib4j.segmentation.Labeling;
 import mmlib4j.segmentation.WatershedByIFT;
@@ -74,19 +71,25 @@ import mmlib4j.utils.ImageAlgebra;
  */ 
 public class UltimateLevelings  extends PlugInFrame implements ActionListener, ChangeListener,  WindowListener, MouseListener {
 	
+	public final static int PRUNING_EXTINCTION_VALUE = 11;
+	public final static int PRUNING_MSER = 15;
+	public final static int PRUNING_TBMR = 16;
+	public final static int PRUNING_GRADUAL_TRANSITION = 17;
+	public final static int PRUNING = 0;
+	
 	private static final long serialVersionUID = 1L;
 	private GrayScaleImage imgInput;
 	private GrayScaleImage imgInputOriginal;
 	private GrayScaleImage imgCurrent;
 	
-	private MorphologicalTreeFiltering tree;
-	private MorphologicalTreeFiltering maxTree;
-	private MorphologicalTreeFiltering minTree;
+	private MorphologicalTree tree;
+	private MorphologicalTree maxTree;
+	private MorphologicalTree minTree;
 	
 	private AdjacencyRelation adj8 = AdjacencyRelation.getCircular(1.5);
 	private boolean flagLabel = false;
 	private boolean flagColor = false;
-	private MappingStrategyOfPruning pruning = null;
+	private FilteringBasedOnPruning pruning = null;
 	private ImagePlus imgPlus;
 	
 	private String titleImg;
@@ -192,13 +195,13 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 		
 		Thread t1 = new Thread(new Runnable() {
 			public void run() {
-				minTree = new ConnectedFilteringByComponentTree(imgInput, adj8, false);		
+				minTree = new ComponentTree(imgInput, adj8, false);		
 			}
 		});
 		
 		Thread t2 = new Thread(new Runnable() {
 			public void run() {
-				maxTree = new ConnectedFilteringByComponentTree(imgInput, adj8, true);		
+				maxTree = new ComponentTree(imgInput, adj8, true);		
 			}
 		});
 		
@@ -291,16 +294,16 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 			//System.out.printf("\n(%d, %d)\n",mousex, mousey);
 			
 			String pruningSelected = (String) this.comboPruningStrategy.getSelectedItem();
-			int typePruning = MorphologicalTreeFiltering.PRUNING;
+			int typePruning = PRUNING;
 			if(pruningSelected.equals("Gradual transition")){
-				typePruning = MorphologicalTreeFiltering.PRUNING_GRADUAL_TRANSITION;
+				typePruning = PRUNING_GRADUAL_TRANSITION;
 			}
 			else if(pruningSelected.equals("MSER") || pruningSelected.equals("MSER by rank")){
-				typePruning = MorphologicalTreeFiltering.PRUNING_MSER;
+				typePruning = PRUNING_MSER;
 			}
 			
 			else if(pruningSelected.equals("Extinction value")){
-				typePruning = MorphologicalTreeFiltering.PRUNING_EXTINCTION_VALUE;
+				typePruning = PRUNING_EXTINCTION_VALUE;
 			}
 			
 			if(comboResiduo.getSelectedItem().equals("Max{ ultimate Attribute opening and closing }")){
@@ -446,7 +449,7 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 		comboFilterRegion.setBorder(BorderFactory.createTitledBorder("Filtering of residues"));
 		comboFilterRegion.addItem("--- no filtering ---");
 		comboFilterRegion.addItem("MSER");
-		comboFilterRegion.addItem("MSER by rank");
+		//comboFilterRegion.addItem("MSER by rank");
 		comboFilterRegion.addItem("TBMR");
 		comboFilterRegion.addItem("-- filtering by classifier --");
 		comboFilterRegion.addItem("---- Text location ----");
@@ -541,7 +544,7 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 
 	
 	public void initResiduo(){
-		tree = new ConnectedFilteringByComponentTree(imgInput, adj8, true);
+		tree = new ComponentTree(imgInput, adj8, true);
 		comboAttributoResiduo.setSelectedIndex(1);
 		attributeValueMaxResiduo.setValue(0);
 		paramDeltaOfPruningStrategies.setValue(0);
@@ -560,7 +563,7 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 			updateExtractionResidues();
 		}
 		else if(comboResiduo.getSelectedItem().equals("Ultimate grain filter")){
-			tree = new ConnectedFilteringByTreeOfShape(imgCurrent);
+			tree = new TreeOfShape(imgCurrent);
 			updateExtractionResidues();
 		}
 		
@@ -579,7 +582,7 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 			else if(pruningSelected.equals("MSER")){
 				System.out.println("ComponentTree - MSER");
 				int delta = paramDeltaOfPruningStrategies.getValue();
-				return new PruningBasedMSER(tree, delta).getMappingSelectedNodes();
+				return new PruningBasedMSER(tree, paramMSER.attribute, delta).getMappingSelectedNodes();
 			}
 			else if(pruningSelected.equals("TBMR")){
 				System.out.println("ComponentTree - TBMR");
@@ -589,8 +592,9 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 			}
 			else if(pruningSelected.equals("Extinction value")){
 				System.out.println("ComponentTree - Extinction value");
-				int delta = paramDeltaOfPruningStrategies.getValue();
-				return new PruningBasedExtinctionValue(tree, getAttributeType(), delta).getMappingSelectedNodes();
+				int deltaMax = paramDeltaOfPruningStrategies.getValue();
+				int deltaMin = (int) tree.getRoot().getAttributeValue(getAttributeType());
+				return new PruningBasedExtinctionValue(tree, getAttributeType(), deltaMin, deltaMax).getMappingSelectedNodes();
 			}
 		}else{
 			//TreeOfShape tree = (TreeOfShape) this.tree;
@@ -603,7 +607,7 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 			else if(pruningSelected.equals("MSER")){
 				System.out.println("TreeOfShape - MSER");
 				int delta = paramDeltaOfPruningStrategies.getValue();
-				return new PruningBasedMSER(tree, delta).getMappingSelectedNodes();
+				return new PruningBasedMSER(tree, paramMSER.attribute, delta).getMappingSelectedNodes();
 			}
 			else if(pruningSelected.equals("TBMR")){
 				System.out.println("TreeOfShape - TBMR");
@@ -612,12 +616,13 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 			}
 			else if(pruningSelected.equals("Extinction value")){
 				System.out.println("TreeOfShape - Extinction value");
-				int delta = paramDeltaOfPruningStrategies.getValue();
-				return new PruningBasedExtinctionValue(tree, getAttributeType(), delta).getMappingSelectedNodes();
+				int deltaMax = paramDeltaOfPruningStrategies.getValue();
+				int deltaMin = (int) tree.getRoot().getAttributeValue(getAttributeType());
+				return new PruningBasedExtinctionValue(tree, getAttributeType(), deltaMin, deltaMax).getMappingSelectedNodes();
 			}
 			
 		}
-		return new PruningBasedAttribute(tree, getAttributeType()).getMappingSelectedNodes();
+		return new PruningBasedAttribute(tree, getAttributeType(), tree.getRoot().getAttributeValue(getAttributeType())).getMappingSelectedNodes();
 		
 	}
 	
@@ -631,15 +636,15 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 			if(pruningSelected.equals("MSER")){
 				System.out.println("ComponentTree - MSER");
 				int delta = paramDeltaOfFilter.getValue();
-				pruning = new PruningBasedMSER(tree, delta);
-				((PruningBasedMSER) pruning).setParameters(paramMSER.minArea, paramMSER.maxArea, paramMSER.maxVariation, paramMSER.attribute);				
+				pruning = new PruningBasedMSER(tree, paramMSER.attribute, delta);
+				((PruningBasedMSER) pruning).setParameters(paramMSER.minArea, paramMSER.maxArea, paramMSER.maxVariation);				
 				return pruning.getMappingSelectedNodes(); //new MserCT(tree).getMappingNodesByMSER(delta);
 			}
 			if(pruningSelected.equals("MSER by rank")){
 				System.out.println("ComponentTree - MSER by rank");
 				int delta = paramDeltaOfFilter.getValue();
-				pruning = new PruningBasedMSER(tree, delta);
-				((PruningBasedMSER) pruning).setParameters(paramMSER.minArea, paramMSER.maxArea, paramMSER.maxVariation, paramMSER.attribute);
+				pruning = new PruningBasedMSER(tree,paramMSER.attribute, delta);
+				((PruningBasedMSER) pruning).setParameters(paramMSER.minArea, paramMSER.maxArea, paramMSER.maxVariation);
 				return ((PruningBasedMSER) pruning).getMappingSelectedNodesRank();
 			}
 			else if(pruningSelected.equals("---- Text location ----")){
@@ -687,15 +692,15 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 			if(pruningSelected.equals("MSER")){
 				System.out.println("TreeOfShape - MSER");
 				int delta = paramDeltaOfFilter.getValue();
-				pruning = new PruningBasedMSER((MorphologicalTreeFiltering)tree, delta);
-				((PruningBasedMSER) pruning).setParameters(paramMSER.minArea, paramMSER.maxArea, paramMSER.maxVariation, paramMSER.attribute);
+				pruning = new PruningBasedMSER(tree, paramMSER.attribute, delta);
+				((PruningBasedMSER) pruning).setParameters(paramMSER.minArea, paramMSER.maxArea, paramMSER.maxVariation);
 				return pruning.getMappingSelectedNodes(); 
 			}
 			if(pruningSelected.equals("MSER by rank")){
 				System.out.println("TreeOfShape - MSER by rank");
 				int delta = paramDeltaOfFilter.getValue();
-				pruning = new PruningBasedMSER((MorphologicalTreeFiltering)tree, delta);
-				((PruningBasedMSER) pruning).setParameters(paramMSER.minArea, paramMSER.maxArea, paramMSER.maxVariation, paramMSER.attribute);
+				pruning = new PruningBasedMSER(tree, paramMSER.attribute, delta);
+				((PruningBasedMSER) pruning).setParameters(paramMSER.minArea, paramMSER.maxArea, paramMSER.maxVariation);
 				return ((PruningBasedMSER) pruning).getMappingSelectedNodesRank();
 			}
 			else if(pruningSelected.equals("---- Text location ----")){
@@ -977,7 +982,7 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 				if(!isValidPrimitiveType()){
 					comboAttributoResiduo.setSelectedIndex(1);
 				}
-				tree = new ConnectedFilteringByTreeOfShape(imgInput);
+				tree = new TreeOfShape(imgInput);
 				updateExtractionResidues();
 			}
 			
@@ -1100,26 +1105,26 @@ public class UltimateLevelings  extends PlugInFrame implements ActionListener, C
 		//int attributeValueMin = 0;
 		
 		//attributeValueMin = attributeValueMinResiduo.getValue();
-		MorphologicalTreeFiltering tree = null;
-		MorphologicalTreeFiltering maxTree= null;
-		MorphologicalTreeFiltering minTree= null;
+		MorphologicalTree tree = null;
+		MorphologicalTree maxTree= null;
+		MorphologicalTree minTree= null;
 		if(img == imgInput){
 			tree = this.tree;
 			maxTree = this.maxTree;
 			minTree = this.minTree;
 		}else{
 			if(comboResiduo.getSelectedItem().equals("Ultimate Attribute opening")){
-				tree = new ConnectedFilteringByComponentTree(img, adj8, true);
+				tree = new ComponentTree(img, adj8, true);
 			}
 			if(comboResiduo.getSelectedItem().equals("Max{ ultimate Attribute opening and closing }")){
-				maxTree = new ConnectedFilteringByComponentTree(img, adj8, true);
-				minTree = new ConnectedFilteringByComponentTree(img, adj8, false);
+				maxTree = new ComponentTree(img, adj8, true);
+				minTree = new ComponentTree(img, adj8, false);
 			}
 			else if(comboResiduo.getSelectedItem().equals("Ultimate Attribute closing")){
-				tree = new ConnectedFilteringByComponentTree(img, adj8, false);
+				tree = new ComponentTree(img, adj8, false);
 			}
 			else if(comboResiduo.getSelectedItem().equals("Ultimate grain filter")){
-				tree = new ConnectedFilteringByTreeOfShape(img);
+				tree = new TreeOfShape(img);
 			}
 		}
 		

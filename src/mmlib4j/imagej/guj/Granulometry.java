@@ -10,6 +10,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import mmlib4j.imagej.utils.ImageJAdapter;
+import mmlib4j.representation.tree.NodeLevelSets;
 import mmlib4j.representation.tree.componentTree.ComponentTree;
 import mmlib4j.representation.tree.componentTree.NodeCT;
 
@@ -23,7 +24,7 @@ public class Granulometry  {
     
 	
 	
-	public Granulometry(ArrayList<NodeCT>[] dist, ComponentTree tree){
+	public Granulometry(ArrayList<NodeLevelSets>[] dist, ComponentTree tree){
 		patternSpectrumUltimateLeveling(dist, tree);
 		//selectedPrimitives(dist, tree);
 		//patternSpectrumCC(dist, tree);
@@ -33,7 +34,7 @@ public class Granulometry  {
 	
 	
 
-	public void patternSpectrumUltimateLeveling(ArrayList<NodeCT>[] dist, ComponentTree tree){
+	public void patternSpectrumUltimateLeveling(ArrayList<NodeLevelSets>[] dist, ComponentTree tree){
 		
 		ImageStack stack = new ImageStack(tree.getInputImage().getWidth(), tree.getInputImage().getHeight());
 		ByteProcessor img = ImageJAdapter.toByteProcessor(tree.getInputImage());
@@ -57,13 +58,13 @@ public class Granulometry  {
 				py[index] = py[index-1];
 				px[index] = index;
 				
-				for(NodeCT node: dist[i]){
+				for(NodeLevelSets node: dist[i]){
 					if(node.getParent() != null){
 						if(tree.isMaxtree()){
-							py[index] -= node.getCanonicalPixels().size() * Math.abs(node.getLevel() - node.getParent().getLevel());
+							py[index] -= node.getCompactNodePixels().size() * Math.abs(node.getLevel() - node.getParent().getLevel());
 						}
 						else{
-							py[index] += node.getCanonicalPixels().size() * Math.abs(node.getLevel() - node.getParent().getLevel());
+							py[index] += node.getCompactNodePixels().size() * Math.abs(node.getLevel() - node.getParent().getLevel());
 						}
 						ComponentTree.prunning(tree, node);
 					}
@@ -165,12 +166,12 @@ public class Granulometry  {
 				for(NodeCT node: dist[i-1]){
 					if(node.getParent() != null){
 						if(tree.isMaxtree()){
-							py[index] -= node.getCanonicalPixels().size() * Math.abs(node.getLevel() - node.getParent().getLevel());
-							pyPS[i] -= node.getCanonicalPixels().size() * Math.abs(node.getLevel() - node.getParent().getLevel());
+							py[index] -= node.getCompactNodePixels().size() * Math.abs(node.getLevel() - node.getParent().getLevel());
+							pyPS[i] -= node.getCompactNodePixels().size() * Math.abs(node.getLevel() - node.getParent().getLevel());
 						}
 						else{
-							py[index] += node.getCanonicalPixels().size() * Math.abs(node.getLevel() - node.getParent().getLevel());
-							pyPS[i] += node.getCanonicalPixels().size() * Math.abs(node.getLevel() - node.getParent().getLevel());
+							py[index] += node.getCompactNodePixels().size() * Math.abs(node.getLevel() - node.getParent().getLevel());
+							pyPS[i] += node.getCompactNodePixels().size() * Math.abs(node.getLevel() - node.getParent().getLevel());
 						}
 						ComponentTree.prunning(tree, node);
 					}
@@ -293,9 +294,9 @@ public class Granulometry  {
 				for(NodeCT node: dist[i]){
 					if(node.getParent() != null){
 						if(tree.isMaxtree())
-							py[i] -= node.getCanonicalPixels().size() * Math.abs(node.getLevel() - node.getParent().getLevel());
+							py[i] -= node.getCompactNodePixels().size() * Math.abs(node.getLevel() - node.getParent().getLevel());
 						else
-							py[i] += node.getCanonicalPixels().size() * Math.abs(node.getLevel() - node.getParent().getLevel());
+							py[i] += node.getCompactNodePixels().size() * Math.abs(node.getLevel() - node.getParent().getLevel());
 						ComponentTree.prunning(tree, node);
 					}
 				}

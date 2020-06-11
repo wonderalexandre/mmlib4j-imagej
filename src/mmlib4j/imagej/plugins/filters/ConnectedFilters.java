@@ -1,12 +1,5 @@
 package mmlib4j.imagej.plugins.filters;
 
-import ij.ImagePlus;
-import ij.WindowManager;
-import ij.gui.GUI;
-import ij.gui.GenericDialog;
-import ij.plugin.frame.PlugInFrame;
-import ij.process.ByteProcessor;
-
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -26,23 +19,28 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import ij.ImagePlus;
+import ij.WindowManager;
+import ij.gui.GUI;
+import ij.gui.GenericDialog;
+import ij.plugin.frame.PlugInFrame;
+import ij.process.ByteProcessor;
+import mmlib4j.filtering.AttributeFilters;
 import mmlib4j.imagej.guj.HistogramOfBranch;
 import mmlib4j.imagej.guj.VisualizationComponentTree;
-import mmlib4j.imagej.guj.VisualizationTreeOfShape;
+import mmlib4j.imagej.plugins.residual.UltimateLevelings;
 import mmlib4j.imagej.utils.ImageJAdapter;
 import mmlib4j.images.GrayScaleImage;
 import mmlib4j.representation.tree.InfoPrunedTree;
-import mmlib4j.representation.tree.MorphologicalTreeFiltering;
+import mmlib4j.representation.tree.InfoTree;
+import mmlib4j.representation.tree.MorphologicalTree;
 import mmlib4j.representation.tree.attribute.Attribute;
-import mmlib4j.representation.tree.attribute.ComputerExtinctionValueComponentTree;
-import mmlib4j.representation.tree.attribute.ComputerExtinctionValueTreeOfShapes;
-import mmlib4j.representation.tree.attribute.ComputerMserTreeOfShapes;
-import mmlib4j.representation.tree.attribute.ComputerTbmrComponentTree;
 import mmlib4j.representation.tree.componentTree.ComponentTree;
-import mmlib4j.representation.tree.componentTree.ConnectedFilteringByComponentTree;
 import mmlib4j.representation.tree.pruningStrategy.PruningBasedAttribute;
+import mmlib4j.representation.tree.pruningStrategy.PruningBasedExtinctionValue;
 import mmlib4j.representation.tree.pruningStrategy.PruningBasedGradualTransition;
-import mmlib4j.representation.tree.tos.ConnectedFilteringByTreeOfShape;
+import mmlib4j.representation.tree.pruningStrategy.PruningBasedMSER;
+import mmlib4j.representation.tree.pruningStrategy.PruningBasedTBMR;
 import mmlib4j.representation.tree.tos.TreeOfShape;
 import mmlib4j.segmentation.Labeling;
 import mmlib4j.utils.AdjacencyRelation;
@@ -56,12 +54,14 @@ import mmlib4j.utils.ImageAlgebra;
  */
 public class ConnectedFilters extends PlugInFrame implements MouseListener, ActionListener, ChangeListener, WindowListener {
 	
+	
+	
 	private static final long serialVersionUID = 2712059893881609948L;
 	
 	private GrayScaleImage imgInput;
 	private GrayScaleImage imgCurrent;
-	private MorphologicalTreeFiltering tree;
-	private InfoPrunedTree prunedTree;
+	private MorphologicalTree tree;
+	private InfoTree prunedTree;
 	
 	private AdjacencyRelation adj8 = AdjacencyRelation.getCircular(1.5);
 	private ImagePlus imgPlus;
@@ -90,7 +90,7 @@ public class ConnectedFilters extends PlugInFrame implements MouseListener, Acti
 		this.imgPlus = plus;
 		this.imgInput = imgCurrent = ImageJAdapter.toGrayScaleImage( (ByteProcessor) plus.getProcessor());
 		
-		tree = new ConnectedFilteringByComponentTree(imgInput, adj8, true);
+		tree = new ComponentTree(imgInput, adj8, true);
 		
 		super.setLayout(new BorderLayout());
 		super.add( createPanelFiltering( ) );
@@ -122,17 +122,53 @@ public class ConnectedFilters extends PlugInFrame implements MouseListener, Acti
 		comboAttributoFilter.setBorder(BorderFactory.createTitledBorder("Attribute type"));
 		comboAttributoFilter.addItem("Area");
 		comboAttributoFilter.addItem("Volume");
-		//comboAttributoFilter.addItem("Altitude");
+		comboAttributoFilter.addItem("Altitude");
 		comboAttributoFilter.addItem("Height");
 		comboAttributoFilter.addItem("Width");
-		//comboAttributoFilter.addItem("Length major axes");
+		comboAttributoFilter.addItem("Level");
+		comboAttributoFilter.addItem("Rectangularity");
+		comboAttributoFilter.addItem("Ratio with/height");
+		comboAttributoFilter.addItem("Variance level");
+		comboAttributoFilter.addItem("Average level");
+		comboAttributoFilter.addItem("STD level");
+		comboAttributoFilter.addItem("Moment - compactness");
+		comboAttributoFilter.addItem("Moment - eccentricity");
+		comboAttributoFilter.addItem("Moment - elongation");
+		comboAttributoFilter.addItem("Moment - lenght major axes");
+		comboAttributoFilter.addItem("Moment - lenght minor axes");
+		comboAttributoFilter.addItem("Moment - orientation");
+		comboAttributoFilter.addItem("Moment - aspect ratio");
+		comboAttributoFilter.addItem("Moment of inertia");
+		comboAttributoFilter.addItem("Perimeter external");
+		comboAttributoFilter.addItem("Circularity");
+		comboAttributoFilter.addItem("Compactness");
+		comboAttributoFilter.addItem("Elongation");
+		comboAttributoFilter.addItem("Sum gradient of contour");
+		comboAttributoFilter.addItem("Functional attribute");
+		comboAttributoFilter.addItem("Bitquads - perimeter");
+		comboAttributoFilter.addItem("Bitquads - euler number");
+		comboAttributoFilter.addItem("Bitquads - hole number");
+		comboAttributoFilter.addItem("Bitquads - perimeter continuous");
+		comboAttributoFilter.addItem("Bitquads - circularity");
+		comboAttributoFilter.addItem("Bitquads - average area");
+		comboAttributoFilter.addItem("Bitquads - average perimeter");
+		comboAttributoFilter.addItem("Bitquads - average lenght");
+		comboAttributoFilter.addItem("Bitquads - average width");
+		
 		
 		//3
 		comboPruningFilter = new JComboBox();
 		comboPruningFilter.setBorder(BorderFactory.createTitledBorder("Pruning strategy"));
+		
+		comboPruningFilter.addItem("Pruning Min");
+		comboPruningFilter.addItem("Pruning Max");
+		comboPruningFilter.addItem("Pruning Vertebi");
+		
+		comboPruningFilter.addItem("Direct rule");
+		comboPruningFilter.addItem("Subtractive rule");
+		
 		comboPruningFilter.addItem("Extinction Value");
 		comboPruningFilter.addItem("MSER");
-		comboPruningFilter.addItem("Pruning");
 		comboPruningFilter.addItem("TBMR");
 		comboPruningFilter.addItem("Gradual transition");
 		comboPruningFilter.setSelectedIndex(2);
@@ -220,7 +256,7 @@ public class ConnectedFilters extends PlugInFrame implements MouseListener, Acti
 		int mousex = e.getX();
 		int mousey = e.getY();
 		HistogramOfBranch winHist = new HistogramOfBranch(getAttributeType(), mousex, mousey);
-		winHist.run(prunedTree, getPruningType(), deltaMSER);
+		winHist.run( (InfoPrunedTree) prunedTree, getPruningType(), deltaMSER);
 		
 	}
 
@@ -236,41 +272,110 @@ public class ConnectedFilters extends PlugInFrame implements MouseListener, Acti
 	
 	public int getPruningType(){
 		if(comboPruningFilter.getSelectedItem().equals("Extinction Value")){
-			return MorphologicalTreeFiltering.PRUNING_EXTINCTION_VALUE;
+			return UltimateLevelings.PRUNING_EXTINCTION_VALUE;
 		}
 		else if(comboPruningFilter.getSelectedItem().equals("MSER")){
-			return MorphologicalTreeFiltering.PRUNING_MSER;
+			return UltimateLevelings.PRUNING_MSER;
 		}
 		else if(comboPruningFilter.getSelectedItem().equals("TBMR")){
-			return MorphologicalTreeFiltering.PRUNING_TBMR;
+			return UltimateLevelings.PRUNING_TBMR;
 		}
 		else if(comboPruningFilter.getSelectedItem().equals("Gradual transition")){
-			return MorphologicalTreeFiltering.PRUNING_GRADUAL_TRANSITION;
+			return UltimateLevelings.PRUNING_GRADUAL_TRANSITION;
 		}
-		else {
-			return MorphologicalTreeFiltering.PRUNING;
+		else if(comboPruningFilter.getSelectedItem().equals("Pruning Min")){
+			return AttributeFilters.PRUNING_MIN;
 		}
+		else if(comboPruningFilter.getSelectedItem().equals("Pruning Max")){
+			return AttributeFilters.PRUNING_MAX;
+		}
+		else if(comboPruningFilter.getSelectedItem().equals("Pruning Vertebi")){
+			return AttributeFilters.PRUNING_VITERBI;
+		}
+		else if(comboPruningFilter.getSelectedItem().equals("Direct rule")){
+			return AttributeFilters.DIRECT_RULE;
+		}
+		else if(comboPruningFilter.getSelectedItem().equals("Subtractive rule")){
+			return AttributeFilters.SUBTRACTIVE_RULE;
+		}else
+			return AttributeFilters.PRUNING_MIN;
 		
 	}
-	
-	
+		
 	
 	public int getAttributeType(){
 		if(comboAttributoFilter.getSelectedItem().equals("Area")){ //area
 			return Attribute.AREA;
-		}
-		else if(comboAttributoFilter.getSelectedItem().equals("Volume")){ //volume
+		}else if(comboAttributoFilter.getSelectedItem().equals("Volume")){ //volume
 			return Attribute.VOLUME;
-		}
-		else if(comboAttributoFilter.getSelectedItem().equals("Height")){ //Height
+		}else if(comboAttributoFilter.getSelectedItem().equals("Height")){ //Height
 			return Attribute.HEIGHT;
-		}
-		else if(comboAttributoFilter.getSelectedItem().equals("Width")){ //Width
+		}else if(comboAttributoFilter.getSelectedItem().equals("Width")){ //Width
 			return Attribute.WIDTH;
-		}
-		else if(comboAttributoFilter.getSelectedItem().equals("Altitude")){ //Width
+		}else if(comboAttributoFilter.getSelectedItem().equals("Altitude")){ //Width
 			return Attribute.ALTITUDE;
+		}else if(comboAttributoFilter.getSelectedItem().equals("Level")){ //Width
+			return Attribute.LEVEL;
+		}else if(comboAttributoFilter.getSelectedItem().equals("Rectangularity")){ //Width
+			return Attribute.RECTANGULARITY;
+		}else if(comboAttributoFilter.getSelectedItem().equals("Ratio with/height")){ //Width
+			return Attribute.RATIO_WIDTH_HEIGHT;
+		}else if(comboAttributoFilter.getSelectedItem().equals("Variance level")){
+			return Attribute.VARIANCE_LEVEL;
+		}else if(comboAttributoFilter.getSelectedItem().equals("Average level")){
+			return Attribute.LEVEL_MEAN;
+		}else if(comboAttributoFilter.getSelectedItem().equals("STD level")){ 
+			return Attribute.STD_LEVEL;
+		}else if(comboAttributoFilter.getSelectedItem().equals("Moment - compactness")){
+			return Attribute.MOMENT_COMPACTNESS;
+		}else if(comboAttributoFilter.getSelectedItem().equals("Moment - eccentricity")){
+			return Attribute.MOMENT_ECCENTRICITY;
+		}else if(comboAttributoFilter.getSelectedItem().equals("Moment - elongation")){ 
+			return Attribute.MOMENT_ELONGATION;
+		}else if(comboAttributoFilter.getSelectedItem().equals("Moment - lenght major axes")){
+			return Attribute.MOMENT_LENGTH_MAJOR_AXES;
+		}else if(comboAttributoFilter.getSelectedItem().equals("Moment - lenght minor axes")){
+			return Attribute.MOMENT_LENGTH_MINOR_AXES;
+		}else if(comboAttributoFilter.getSelectedItem().equals("Moment - orientation")){ 
+			return Attribute.MOMENT_ORIENTATION;
+		}else if(comboAttributoFilter.getSelectedItem().equals("Moment - aspect ratio")){
+			return Attribute.MOMENT_ASPECT_RATIO;
+		}else if(comboAttributoFilter.getSelectedItem().equals("Moment of inertia")){
+			return Attribute.MOMENT_OF_INERTIA;
+		}else if(comboAttributoFilter.getSelectedItem().equals("Bitquads - perimeter")){ 
+			return Attribute.BIT_QUADS_PERIMETER;
+		}else if(comboAttributoFilter.getSelectedItem().equals("Bitquads - euler number")){
+			return Attribute.BIT_QUADS_EULER_NUMBER;
+		}else if(comboAttributoFilter.getSelectedItem().equals("Bitquads - hole number")){ 
+			return Attribute.BIT_QUADS_HOLE_NUMBER;
+		}else if(comboAttributoFilter.getSelectedItem().equals("Bitquads - perimeter continuous")){ 
+			return Attribute.BIT_QUADS_PERIMETER_CONTINUOUS;
+		}else if(comboAttributoFilter.getSelectedItem().equals("Bitquads - circularity")){ 
+			return Attribute.BIT_QUADS_CIRCULARITY;
+		}else if(comboAttributoFilter.getSelectedItem().equals("Bitquads - average area")){
+			return Attribute.BIT_QUADS_AVERAGE_AREA;
+		}else if(comboAttributoFilter.getSelectedItem().equals("Bitquads - average perimeter")){ 
+			return Attribute.BIT_QUADS_AVERAGE_PERIMETER;
+		}else if(comboAttributoFilter.getSelectedItem().equals("Bitquads - average lenght")){ 
+			return Attribute.BIT_QUADS_AVERAGE_LENGTH;
+		}else if(comboAttributoFilter.getSelectedItem().equals("Bitquads - average width")){ 
+			return Attribute.BIT_QUADS_AVERAGE_WIDTH;
+		}else if(comboAttributoFilter.getSelectedItem().equals("Functional attribute")){ //Width
+			return Attribute.FUNCTIONAL_ATTRIBUTE;
 		}
+		else if(comboAttributoFilter.getSelectedItem().equals("Perimeter external")){ //Width
+			return Attribute.PERIMETER_EXTERNAL;
+		}else if(comboAttributoFilter.getSelectedItem().equals("Circularity")){ //Width
+			return Attribute.CIRCULARITY;
+		}else if(comboAttributoFilter.getSelectedItem().equals("Compactness")){ //Width
+			return Attribute.COMPACTNESS;
+		}else if(comboAttributoFilter.getSelectedItem().equals("Elongation")){ //Width
+			return Attribute.ELONGATION;
+		}else if(comboAttributoFilter.getSelectedItem().equals("Sum gradient of contour")){ //Width
+			return Attribute.SUM_GRAD_CONTOUR;
+		}
+		
+		
 		else if(comboAttributoFilter.getSelectedItem().equals("Length major axes")){ //Width
 			return Attribute.MOMENT_LENGTH_MAJOR_AXES;
 		}
@@ -278,8 +383,12 @@ public class ConnectedFilters extends PlugInFrame implements MouseListener, Acti
 			return -1;
 	}
 	
-	public int getAttributeValue(){
-		int attributeValue = 0;
+	public double getAttributeValue(){
+		
+		double max = Attribute.getMaxValue(tree, getAttributeType());
+		double attributeValue =  (attributeValueFilter.getValue() / 100.0) * max ;
+		attributeValue = Math.pow(max, 1-2) * Math.pow(attributeValue, 2); //funcao potencia
+		/*
 		if(comboAttributoFilter.getSelectedItem().equals("Area")){ //area
 			attributeValue = (int) ((attributeValueFilter.getValue() / 100.0) * imgCurrent.getSize());
 			attributeValue = (int) Math.floor(Math.pow(imgCurrent.getSize(), 1-2) * Math.pow(attributeValue, 2)); //funcao potencia
@@ -304,19 +413,21 @@ public class ConnectedFilters extends PlugInFrame implements MouseListener, Acti
 			attributeValue = (int) ((attributeValueFilter.getValue() / 100.0) * Math.max(imgCurrent.getWidth(), imgCurrent.getHeight()));
 			attributeValue = (int) Math.floor(Math.pow(Math.max(imgCurrent.getWidth(), imgCurrent.getHeight()), 1-2) * Math.pow(attributeValue, 2)); //funcao potencia
 		}
-		
+		*/
 		return attributeValue;
 	}
 	
 	
 	public void applyFilter(boolean process){
-		int typeRec = MorphologicalTreeFiltering.RULE_DIRECT;
-		int attributeValue = getAttributeValue();
+		//int typeRec = AttributeFilters.PRUNING_MIN;
+		if(!Attribute.hasAttribute(tree, getAttributeType()))
+			Attribute.loadAttribute(tree, getAttributeType());
+		double attributeValue = getAttributeValue();
 		if(process){
 			lastAttributeValue = attributeValue;
 			lastAttributeType = getAttributeType();
 			lastPruning = getPruningType();
-			lastTypeRec = typeRec;
+			//lastTypeRec = typeRec;
 			filteringProcessing();
 			
 		}
@@ -324,53 +435,61 @@ public class ConnectedFilters extends PlugInFrame implements MouseListener, Acti
 		
 	}
 	
-	private int lastAttributeValue; 
+	private double lastAttributeValue; 
 	private int lastAttributeType;
 	private int lastPruning;
 	private int lastTypeRec;
 	 
-	public InfoPrunedTree processPrunedTree(){
-		InfoPrunedTree prunedTree = null;
-		ConnectedFilteringByComponentTree ct = (ConnectedFilteringByComponentTree)tree;
-		if(lastPruning == MorphologicalTreeFiltering.PRUNING_EXTINCTION_VALUE){
-			prunedTree = ct.getPrunedTreeByExtinctionValue(lastAttributeValue, lastAttributeType);
+	public InfoTree processPrunedTree(){
+		InfoTree prunedTree = null;
+		
+		if(lastPruning == UltimateLevelings.PRUNING_EXTINCTION_VALUE){
+			prunedTree =  new PruningBasedExtinctionValue(tree, lastAttributeType).getPrunedTree(lastAttributeValue);
 		}
-		else if(lastPruning == MorphologicalTreeFiltering.PRUNING_MSER){
-			prunedTree = ct.getPrunedTreeByMSER(lastAttributeValue, lastAttributeType, deltaMSER);
+		else if(lastPruning == UltimateLevelings.PRUNING_MSER){
+			prunedTree = new PruningBasedMSER(tree, Attribute.AREA, deltaMSER).getPrunedTree(lastAttributeValue);
 		}
-		else if(lastPruning == MorphologicalTreeFiltering.PRUNING_GRADUAL_TRANSITION){
-			prunedTree = ct.getPrunedTreeByGradualTransition(lastAttributeValue, lastAttributeType, gradualTransition);
+		else if(lastPruning == UltimateLevelings.PRUNING_GRADUAL_TRANSITION){
+			prunedTree = new PruningBasedGradualTransition(tree, lastAttributeType, gradualTransition).getPrunedTree(lastAttributeValue);
+			//prunedTree = new AttributeFilters(tree).getPrunedTreeByGradualTransition(lastAttributeValue, lastAttributeType, gradualTransition);
 		}
-		else if(lastPruning == MorphologicalTreeFiltering.PRUNING_TBMR){
+		else if(lastPruning == UltimateLevelings.PRUNING_TBMR){
 			int tMin = 100;
 			int tMax = (int) (tree.getInputImage().getSize() * 0.80);
-			prunedTree = ct.getPrunedTreeByTBMR(lastAttributeValue, lastAttributeType, tMin, tMax);
+			prunedTree = new PruningBasedTBMR(tree, tMin, tMax).getPrunedTree(lastAttributeValue);
+		}
+		else if(lastPruning == AttributeFilters.DIRECT_RULE){
+			prunedTree = new AttributeFilters(tree).getInfoMergedTreeByDirectRule(lastAttributeValue, lastAttributeType);
+		}
+		else if(lastPruning == AttributeFilters.SUBTRACTIVE_RULE){
+			prunedTree = new AttributeFilters(tree).getInfoMergedTreeBySubstractiveRule(lastAttributeValue, lastAttributeType);
 		}
 		else {
-			prunedTree = ct.getPrunedTree(lastAttributeValue, lastAttributeType);
+			prunedTree = new AttributeFilters(tree).getInfoPrunedTree(lastAttributeValue, lastAttributeType, lastPruning);
 		}
 		return prunedTree;
 	}
 	
 	public void filteringProcessing(){
-		if(tree instanceof ConnectedFilteringByComponentTree){
-			ConnectedFilteringByComponentTree ct = (ConnectedFilteringByComponentTree)tree;
+		if(tree instanceof ComponentTree){
+			ComponentTree ct = (ComponentTree)tree;
 			prunedTree = processPrunedTree();
 			if(ct.isMaxtree()){
 				this.numRegionExtremaLabelFilter.setText("num regional maxima: " + prunedTree.getNumLeaves());
-				this.numCCsLabelFilter.setText("num CCs: " + prunedTree.getNunNode() + " (upper set)");
+				this.numCCsLabelFilter.setText("num CCs: " + prunedTree.getNumNode() + " (upper set)");
 			}else{
 				this.numRegionExtremaLabelFilter.setText("num regional minima: " + prunedTree.getNumLeaves());
-				this.numCCsLabelFilter.setText("num CCs: " +  prunedTree.getNunNode() + " (lower set)");
+				this.numCCsLabelFilter.setText("num CCs: " +  prunedTree.getNumNode() + " (lower set)");
 			}
 			imgCurrent = prunedTree.reconstruction();
 			this.numFlatZoneLabelFilter.setText("num flatzone: " + Labeling.getNumFlatzone(imgCurrent, ct.getAdjacency()));
 		}
 		else{
-			ConnectedFilteringByTreeOfShape tos = (ConnectedFilteringByTreeOfShape) tree;
-			prunedTree = tos.getPrunedTree(lastAttributeValue, lastAttributeType, lastPruning);
+			prunedTree = processPrunedTree();
+			//prunedTree = new AttributeFilters(tree).getInfoPrunedTree(lastAttributeValue, lastAttributeType, AttributeFilters.PRUNING_MIN);
+			//prunedTree = tos.getPrunedTree(lastAttributeValue, lastAttributeType, lastPruning);
 			this.numRegionExtremaLabelFilter.setText("num regional extrema: " + prunedTree.getNumLeaves());
-			this.numCCsLabelFilter.setText("num CCs: " + prunedTree.getNunNode() + " (lower/upper set)");
+			this.numCCsLabelFilter.setText("num CCs: " + prunedTree.getNumNode() + " (lower/upper set)");
 			imgCurrent = prunedTree.reconstruction();
 			this.numFlatZoneLabelFilter.setText("num flatzone: " + Labeling.getNumFlatzone(imgCurrent, AdjacencyRelation.getAdjacency8()));
 		}
@@ -386,51 +505,35 @@ public class ConnectedFilters extends PlugInFrame implements MouseListener, Acti
 			changeTreeFiltering();
 		}
 		else if(event.getSource() == applyButtonFilter){
-			if(tree instanceof ComponentTree){
-				if(lastPruning == MorphologicalTreeFiltering.PRUNING_EXTINCTION_VALUE){
-					boolean selected[] = new ComputerExtinctionValueComponentTree((ComponentTree) tree).getExtinctionValueNodeCT(lastAttributeType, prunedTree);
-					VisualizationComponentTree.getInstance( prunedTree, selected, null ).setVisible(true);
-				}
-				else if(lastPruning == MorphologicalTreeFiltering.PRUNING_MSER){
-					//boolean selected[] = new MserCT((ComponentTree) tree).getMappingNodesByMSER(deltaMSER, prunedTree);
-					ComputerTbmrComponentTree tbmr = new ComputerTbmrComponentTree((ComponentTree)tree); 
-					boolean selected[] = tbmr.getSelectedNode(100, 9999999);
-					VisualizationComponentTree.getInstance( prunedTree, selected, null ).setVisible(true);
-				}
-				else if(lastPruning == MorphologicalTreeFiltering.PRUNING_GRADUAL_TRANSITION){
-					PruningBasedGradualTransition gt = new PruningBasedGradualTransition(tree, this.lastAttributeType, gradualTransition);
-					boolean selected[] = gt.getMappingSelectedNodes( );
-					VisualizationComponentTree.getInstance( prunedTree, selected, null ).setVisible(true);
-				}
-				else if(lastPruning == MorphologicalTreeFiltering.PRUNING_TBMR){
-					ComputerTbmrComponentTree tbmr = new ComputerTbmrComponentTree((ComponentTree)tree);
-					int tMin = 100;
-					int tMax = (int) (tree.getInputImage().getSize() * 0.80);
-					boolean selected[] = tbmr.getSelectedNode(tMin, tMax);
-					VisualizationComponentTree.getInstance( prunedTree, selected, null ).setVisible(true);
-				}
-				else{
-					PruningBasedAttribute gt = new PruningBasedAttribute(tree, this.lastAttributeType);
-					boolean selected[] = gt.getMappingSelectedNodes( );
-					VisualizationComponentTree.getInstance( prunedTree, selected, null ).setVisible(true);
-				}
-				
+			if(lastPruning == UltimateLevelings.PRUNING_EXTINCTION_VALUE){
+				boolean selected[] = new PruningBasedExtinctionValue(tree, lastAttributeType).getMappingSelectedNodes();
+				VisualizationComponentTree.getInstance( prunedTree, selected, null ).setVisible(true);
+			}
+			else if(lastPruning == UltimateLevelings.PRUNING_MSER){
+				//boolean selected[] = new MserCT((ComponentTree) tree).getMappingNodesByMSER(deltaMSER, prunedTree);
+				PruningBasedMSER mser = new PruningBasedMSER(tree, Attribute.AREA, deltaMSER); 
+				boolean selected[] = mser.getMappingSelectedNodes();
+				VisualizationComponentTree.getInstance( prunedTree, selected, null ).setVisible(true);
+			}
+			else if(lastPruning == UltimateLevelings.PRUNING_GRADUAL_TRANSITION){
+				PruningBasedGradualTransition gt = new PruningBasedGradualTransition(tree, this.lastAttributeType, gradualTransition);
+				boolean selected[] = gt.getMappingSelectedNodes( );
+				VisualizationComponentTree.getInstance( prunedTree, selected, null ).setVisible(true);
+			}
+			else if(lastPruning == UltimateLevelings.PRUNING_TBMR){
+				int tMin = 100;
+				int tMax = (int) (tree.getInputImage().getSize() * 0.80);
+				PruningBasedTBMR tbmr = new PruningBasedTBMR(tree, tMin, tMax);
+				boolean selected[] = tbmr.getMappingSelectedNodes();
+				VisualizationComponentTree.getInstance( prunedTree, selected, null ).setVisible(true);
 			}
 			else{
-				if(lastPruning == MorphologicalTreeFiltering.PRUNING_EXTINCTION_VALUE){
-					boolean selected[] = new ComputerExtinctionValueTreeOfShapes((TreeOfShape) tree).getExtinctionValueNode(lastAttributeType, prunedTree);
-					VisualizationTreeOfShape.getInstance( prunedTree, selected, null ).setVisible(true);
-				}
-				else if(lastPruning == MorphologicalTreeFiltering.PRUNING_MSER){
-					boolean selected[] = new ComputerMserTreeOfShapes((TreeOfShape) tree).getMappingNodesByMSER(deltaMSER, prunedTree);
-					VisualizationTreeOfShape.getInstance( prunedTree, selected, null ).setVisible(true);
-				}
-				else{
-					VisualizationTreeOfShape.getInstance( prunedTree ).setVisible(true);
-				}
-
-				
+				PruningBasedAttribute gt = new PruningBasedAttribute(tree, this.lastAttributeType, (int)lastAttributeValue);
+				boolean selected[] = gt.getMappingSelectedNodes( );
+					
+				VisualizationComponentTree.getInstance( prunedTree, selected, null ).setVisible(true);
 			}
+			
 		}
 		else if(event.getSource() == reloadButtonFilter){
 			chkLabeling.setSelected(false);
@@ -475,9 +578,9 @@ public class ConnectedFilters extends PlugInFrame implements MouseListener, Acti
 	
 	public void changeTreeFiltering(){
 		if(comboTreeFilter.getSelectedItem().equals("Attribute Opening"))
-			tree = new ConnectedFilteringByComponentTree(imgCurrent, adj8, true);
+			tree = new ComponentTree(imgCurrent, adj8, true);
 		else if(comboTreeFilter.getSelectedItem().equals("Attribute Closing"))
-			tree = new ConnectedFilteringByComponentTree(imgCurrent, adj8, false);
+			tree = new ComponentTree(imgCurrent, adj8, false);
 		else if(comboTreeFilter.getSelectedItem().equals("Grain Filter")){
 			 GenericDialog gd = new GenericDialog("Tree of shape");
 			 gd.addNumericField("point infinity (axis x)", -1, 0);
@@ -490,7 +593,7 @@ public class ConnectedFilters extends PlugInFrame implements MouseListener, Acti
 				 pInfY = (int) gd.getNextNumber();
 			 }
 			
-			tree = new ConnectedFilteringByTreeOfShape(imgCurrent, pInfX, pInfY);
+			tree = new TreeOfShape(imgCurrent, pInfX, pInfY);
 		}
 		
 		applyFilter(true);
